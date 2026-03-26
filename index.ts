@@ -1,5 +1,9 @@
 import express from "express";
+import cors from "cors";
 import { config } from "dotenv";
+import cookieParser from "cookie-parser";
+import { router } from "./router";
+import { errorMiddleware } from "./middlewares/error-midleware";
 import { prisma } from "./lib/prisma";
 
 config();
@@ -7,16 +11,34 @@ config();
 const PORT = process.env.PORT || 7000;
 const app = express();
 
-const start = async () => {
-  try {
-    app.listen(PORT, () => {
-      console.log("start, on PORT = " + PORT);
-    });
-    const user = await prisma.user.findMany();
-    console.log("Created user:", user);
-  } catch (error: any) {
-    console.log(error.message);
-  }
-};
+app.use(express.json());
+app.use(cookieParser());
+app.use(
+  cors({
+    credentials: true, // разрешает обмениваться куками
+    origin: process.env.CLIENT_URL,
+  }),
+);
 
-start();
+app.use("/api", router);
+
+app.use(errorMiddleware);
+
+async function getUsers() {
+  const existingCategory = await prisma.category.findUnique({
+    where: { name: "Название категории" },
+  });
+  if (!existingCategory) {
+    const lala = await prisma.category.create({
+      data: { name: "Название категории" },
+    });
+    console.log("Категория не существует и она создается и = " + lala);
+  } else {
+    console.log("Категория существует и = " + existingCategory.id);
+  }
+}
+
+app.listen(PORT, () => {
+  console.log(`Server started on PORT = ${PORT}`);
+  getUsers();
+});
