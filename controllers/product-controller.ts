@@ -1,15 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { productService } from "../service/product-service";
-import { prisma } from "../lib/prisma";
-
-interface ProductCreateInput {
-  name: string;
-  imageUrl: string;
-  description: string;
-  price: number;
-  size?: number;
-  categoryId: number; // или строка, если передаете название категории
-}
+import { ProductCreateInput } from "../types/types";
 
 class ProductController {
   async getProducts(req: Request, res: Response, next: NextFunction) {
@@ -35,49 +26,61 @@ class ProductController {
         return res.status(404).json({ error: "Продукт не найден" });
       }
 
-      res.json(product);
+      return res.json(product);
     } catch (error) {
       next(error);
     }
   }
 
+  // только для ADMIN
   async createProduct(req: Request, res: Response, next: NextFunction) {
-    // Ошибка Foreign key constraint violated говорит о том, что при попытке вставить новый продукт,
-    // связанный с категорией через categoryId, Prisma не может найти такую категорию в базе данных.
-    // То есть, в таблице категорий нет записи с id = 1.
     try {
-      const { name, imageUrl, description, price, size, categoryId } =
-        req.body as ProductCreateInput; // написать тип на продукт
+      const { name, imageUrl, description, price, categoryName } =
+        req.body as ProductCreateInput;
 
-      if (!name || !imageUrl || !description || !price || !categoryId) {
+      if (!name || !imageUrl || !description || !price || !categoryName) {
         return res
           .status(400)
           .json({ message: "Все обязательные поля должны быть заполнены" });
       }
 
-      const newProduct = await prisma.product.create({
-        data: {
-          name,
-          imageUrl,
-          description,
-          price,
-          size,
-          categoryId,
-        },
-      });
+      const newProduct = await productService.createProduct(
+        req.body,
+        categoryName,
+      );
 
       return res.json(newProduct);
-
-      // return res.json(product);
     } catch (error) {
       console.error(error);
       next(error);
     }
   }
 
-  async updateProduct(req: Request, res: Response, next: NextFunction) {}
+  async updateProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const updateProduct = await productService.updateProduct(req.body);
+      return res.json(updateProduct);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
 
-  async deleteProduct(req: Request, res: Response, next: NextFunction) {}
+  async deleteProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.body;
+      const idNumber = parseInt(id);
+      if (idNumber || idNumber === 0) {
+        const deleteProduct = await productService.deleteProduct(idNumber);
+        return res.json(deleteProduct);
+      } else {
+        return res.json({ message: "Нет такого id для удаления" });
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
 }
 
 export const productController = new ProductController();

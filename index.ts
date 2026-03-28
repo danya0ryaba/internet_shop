@@ -24,21 +24,45 @@ app.use("/api", router);
 
 app.use(errorMiddleware);
 
-async function getUsers() {
-  const existingCategory = await prisma.category.findUnique({
-    where: { name: "Название категории" },
-  });
-  if (!existingCategory) {
-    const lala = await prisma.category.create({
-      data: { name: "Название категории" },
-    });
-    console.log("Категория не существует и она создается и = " + lala);
-  } else {
-    console.log("Категория существует и = " + existingCategory.id);
-  }
-}
+// [
+//   {
+//     id: 2,
+//     name: 'Овощи',
+//     createdAt: 2026-03-27T06:44:34.904Z,
+//     updatedAt: 2026-03-27T06:44:34.904Z
+//   },
+//   {
+//     id: 3,
+//     name: 'Цветы',
+//     createdAt: 2026-03-27T06:44:34.904Z,
+//     updatedAt: 2026-03-27T06:44:34.904Z
+//   },
+//   {
+//     id: 4,
+//     name: 'Зелень и травы',
+//     createdAt: 2026-03-27T06:44:34.904Z,
+//     updatedAt: 2026-03-27T06:44:34.904Z
+//   },
+//   {
+//     id: 5,
+//     name: 'Грибы',
+//     createdAt: 2026-03-27T06:44:34.904Z,
+//     updatedAt: 2026-03-27T06:44:34.904Z
+//   },
+//   {
+//     id: 6,
+//     name: 'Ягоды',
+//     createdAt: 2026-03-27T06:44:34.904Z,
+//     updatedAt: 2026-03-27T06:44:34.904Z
+//   },
+//   {
+//     id: 7,
+//     name: 'Другое',
+//     createdAt: 2026-03-27T06:44:34.904Z,
+//     updatedAt: 2026-03-27T06:44:34.904Z
+//   }
+// ]
 
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
-  getUsers();
 });

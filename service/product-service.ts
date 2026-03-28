@@ -1,4 +1,6 @@
+import { ErroApi } from "../exeptions/error-api";
 import { prisma } from "../lib/prisma";
+import { ProductCreateInput, ProductWithId } from "../types/types";
 
 class ProductService {
   async getAllProducts() {
@@ -13,26 +15,61 @@ class ProductService {
     return product;
   }
 
-  async createProduct(body: any) {
-    // const category = await prisma.category.findUnique({
-    //   where: { name: body.category },
-    // });
-    // category не найдена тк, не создана
-    // if (!category) {
-    //   throw new Error("Category not found");
-    // }
-    const product = await prisma.product.create({
+  // на все эти операции повесить middleware чтобы проверял что это делает ADMIN
+  async createProduct(body: ProductCreateInput, categoryName: string) {
+    // Найди категорию по ее названию
+    const category = await prisma.category.findUnique({
+      where: {
+        name: categoryName,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!category?.id) {
+      throw ErroApi.BadRequestError("Такой категории не существует");
+    }
+
+    const newProduct = await prisma.product.create({
       data: {
         name: body.name,
         imageUrl: body.imageUrl,
         description: body.description,
         price: body.price,
         size: body.size,
-        categoryId: 1,
+        categoryId: category?.id,
       },
     });
-    console.log("product = " + product);
-    // return product;
+
+    return newProduct;
+  }
+
+  async updateProduct(body: ProductWithId) {
+    const updateProduct = await prisma.product.update({
+      where: { id: body.id },
+      data: {
+        name: body.name,
+        imageUrl: body.imageUrl,
+        description: body.description,
+        price: body.price,
+        size: body.size,
+      },
+    });
+
+    if (!updateProduct) {
+      throw ErroApi.BadRequestError("Ошибка при обновлении продукта");
+    }
+
+    return updateProduct;
+  }
+
+  async deleteProduct(id: number) {
+    const deletedProduct = await prisma.product.delete({
+      where: { id },
+    });
+
+    return deletedProduct;
   }
 }
 

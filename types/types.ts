@@ -12,3 +12,16 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ProductCreateInput {
+  name: string;
+  imageUrl: string;
+  description: string;
+  price: number;
+  size?: number;
+  categoryName: string;
+}
+
+export type ProductWithId = ProductCreateInput & {
+  id: number;
+};

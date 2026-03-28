@@ -2,6 +2,7 @@ import { Router } from "express";
 import { userController } from "../controllers/user-controller";
 import { body } from "express-validator";
 import { productController } from "../controllers/product-controller";
+import { cartController } from "../controllers/cart-controller";
 
 export const router = Router();
 
@@ -30,3 +31,10 @@ router.get("/product/:id", productController.getProduct);
 router.post("/product-create", productController.createProduct);
 router.post("/product-update", productController.updateProduct);
 router.post("/product-delete", productController.deleteProduct);
+
+// cart
+router.get("/cart/:id", cartController.getCart);
+router.post("/cart-add-product/:id", cartController.addProductInCart);
+router.post("/cart-remove-product", cartController.removeProductInCart);
+router.post("/cart-make-on-order", cartController.makeOnOrder);
+router.get("/cart-get-all-carts", cartController.getAllCarts);
