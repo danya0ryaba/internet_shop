@@ -88,7 +88,7 @@ class UserController {
       next(error);
     }
   }
-
+  // только для админа
   async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await userService.getAllUsers();

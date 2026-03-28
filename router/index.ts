@@ -3,6 +3,8 @@ import { userController } from "../controllers/user-controller";
 import { body } from "express-validator";
 import { productController } from "../controllers/product-controller";
 import { cartController } from "../controllers/cart-controller";
+import { authMiddleware } from "../middlewares/auth-middleware";
+import { adminMiddleware } from "../middlewares/admin-middleware";
 
 export const router = Router();
 
@@ -17,18 +19,18 @@ router.post("/login", userController.login);
 router.post("/logout", userController.logout);
 router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
-// просто тестовый эндпоит доступный только авторизованным пользователем
-router.get(
-  "/users",
-  // authMiddleware,
-  userController.getUsers,
-);
+// просто тестовый эндпоит доступный только авторизованным пользователем(только для админ)
+router.get("/users", authMiddleware, userController.getUsers);
 
 // product
 router.get("/product", productController.getProducts);
 router.get("/product/:id", productController.getProduct);
-
-router.post("/product-create", productController.createProduct);
+// только для админа
+router.post(
+  "/product-create",
+  adminMiddleware,
+  productController.createProduct,
+);
 router.post("/product-update", productController.updateProduct);
 router.post("/product-delete", productController.deleteProduct);
 

@@ -24,6 +24,11 @@ app.use("/api", router);
 
 app.use(errorMiddleware);
 
+async function users() {
+  const users = await prisma.user.findMany();
+  console.log(users);
+}
+
 // [
 //   {
 //     id: 2,
@@ -65,4 +70,5 @@ app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
+  // users();
 });

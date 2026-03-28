@@ -69,6 +69,7 @@ class UserService {
         email: true,
         isActivated: true,
         password: true,
+        role: true,
       },
     });
 
@@ -136,6 +137,7 @@ class UserService {
         email: true,
         isActivated: true,
         password: true, // явно запрашиваем все нужные поля
+        role: true,
       },
     });
 
@@ -143,6 +145,7 @@ class UserService {
       email: user!.email,
       id: user!.id,
       isActivated: user!.isActivated,
+      role: user!.role,
     });
 
     // генерация токенов

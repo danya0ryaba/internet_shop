@@ -3,6 +3,7 @@ export interface IModelDTO {
   id: number;
   isActivated: boolean;
   order?: unknown;
+  role: "ADMIN" | "USER";
 }
 
 export class UserDTO implements IModelDTO {
@@ -10,10 +11,12 @@ export class UserDTO implements IModelDTO {
   id: number;
   isActivated: boolean;
   order?: unknown;
+  role: "ADMIN" | "USER";
 
   constructor(model: IModelDTO) {
     this.email = model.email;
     this.id = model.id;
     this.isActivated = model.isActivated;
+    this.role = model.role;
   }
 }

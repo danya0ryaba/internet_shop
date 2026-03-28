@@ -2,16 +2,13 @@ import { Request, Response, NextFunction } from "express";
 import { ErroApi } from "../exeptions/error-api";
 import { tokenService } from "../service/token-service";
 import { JwtPayload } from "jsonwebtoken";
+import { IMyRequest } from "./admin-middleware";
 
-interface RequestWithUser extends Request {
-  user?: string | JwtPayload;
-}
+// interface RequestWithUser extends Request {
+//   user?: string | JwtPayload | IMyRequest;
+// }
 
-export function authMiddleware(
-  req: RequestWithUser,
-  res: Response,
-  next: NextFunction,
-) {
+export function authMiddleware(req: any, res: Response, next: NextFunction) {
   try {
     const authorizetionHeader = req.headers.authorization;
     if (!authorizetionHeader) {
