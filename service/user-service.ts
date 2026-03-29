@@ -28,8 +28,26 @@ class UserService {
         email,
         password: hashPassword,
         activationLink,
+        cart: {
+          create: {
+            token: activationLink, // или другой уникальный токен
+            totalAmount: 0,
+          },
+        },
+      },
+      include: {
+        cart: true, // включаем корзину в ответ, если нужно
       },
     });
+
+    // создания корзины пользователя
+    // await prisma.cart.create({
+    //   data: {
+    //     user: { connect: { id: user.id } },
+    //     totalAmount: 0,
+    //     token: activationLink,
+    //   },
+    // });
 
     // письмо на email
     await mailService.sendActivationMail(

@@ -31,12 +31,21 @@ router.post(
   adminMiddleware,
   productController.createProduct,
 );
-router.post("/product-update", productController.updateProduct);
-router.post("/product-delete", productController.deleteProduct);
+router.post(
+  "/product-update",
+  adminMiddleware,
+  productController.updateProduct,
+);
+router.post(
+  "/product-delete",
+  adminMiddleware,
+  productController.deleteProduct,
+);
 
 // cart
 router.get("/cart/:id", cartController.getCart);
-router.post("/cart-add-product/:id", cartController.addProductInCart);
+router.get("/cart-add-product/:id", cartController.addProductInCart);
+
 router.post("/cart-remove-product", cartController.removeProductInCart);
 router.post("/cart-make-on-order", cartController.makeOnOrder);
 router.get("/cart-get-all-carts", cartController.getAllCarts);

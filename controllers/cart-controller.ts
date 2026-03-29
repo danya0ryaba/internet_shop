@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { cartService } from "../service/cart-service";
+import { ErroApi } from "../exeptions/error-api";
+import { tokenService } from "../service/token-service";
 
 class Cart {
   // нужно реализовать чтобы была корзина без регистрации?
@@ -27,15 +29,47 @@ class Cart {
 
   async addProductInCart(req: Request, res: Response, next: NextFunction) {
     try {
-      const productId = parseInt(req.params.id as string);
-
-      if (isNaN(productId)) {
-        return res.status(400).json({
-          error: "Такого продукта не существует. Невозможно добавить в корзину",
-        });
+      // достаю id пользователя из JWT
+      const authorizetionHeader = req.headers.authorization;
+      if (!authorizetionHeader) {
+        return next(ErroApi.UnauthorizenError());
       }
+
+      const accessToken = authorizetionHeader.split(" ")[1];
+
+      if (!accessToken) {
+        return next(ErroApi.UnauthorizenError());
+      }
+
+      const user = tokenService.decodeToken(accessToken);
+
+      if (!user) {
+        return next(ErroApi.UnauthorizenError());
+      }
+      const userId = user.id;
+      //
+      //
+      //
+      //
+
+      const productItemId = parseInt(req.params.id as string); // тут вытаскиваю id товара из строки запроса
+      const quantity = req.body.quantity || 1;
+
+      if (isNaN(productItemId)) {
+        throw ErroApi.BadRequestError("Некорректный ID товара");
+      }
+
+      const cartItem = await cartService.addProductInCart(
+        userId,
+        productItemId,
+        quantity,
+      );
+
+      res.json({
+        success: true,
+        data: cartItem,
+      });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
