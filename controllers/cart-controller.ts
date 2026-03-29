@@ -47,21 +47,20 @@ class Cart {
         return next(ErroApi.UnauthorizenError());
       }
       const userId = user.id;
-      //
-      //
-      //
-      //
 
-      const productItemId = parseInt(req.params.id as string); // тут вытаскиваю id товара из строки запроса
-      const quantity = req.body.quantity || 1;
+      // тут вытаскиваю id товара из строки запроса
+      const productId = parseInt(req.params.id as string);
 
-      if (isNaN(productItemId)) {
+      const quantity = parseInt(req.body.quantity) || 1;
+
+      if (isNaN(productId)) {
         throw ErroApi.BadRequestError("Некорректный ID товара");
       }
 
+      // Проблема в том, что вы передаете id из Product, а не productId из ProductItem.
       const cartItem = await cartService.addProductInCart(
         userId,
-        productItemId,
+        productId,
         quantity,
       );
 

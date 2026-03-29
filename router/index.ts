@@ -43,7 +43,9 @@ router.post(
 );
 
 // cart
+// нужно переписать чтобы id user доставать из jwt
 router.get("/cart/:id", cartController.getCart);
+
 router.get("/cart-add-product/:id", cartController.addProductInCart);
 
 router.post("/cart-remove-product", cartController.removeProductInCart);

@@ -10,10 +10,9 @@ class CartService {
     return cart;
   }
 
-  // тут нужно знать какая это корзина и id пользователя наверное
   async addProductInCart(
     userId: number,
-    productItemId: number,
+    productId: number,
     quantity: number = 1,
   ) {
     // Проверяем, существует ли пользователь
@@ -22,39 +21,48 @@ class CartService {
       include: { cart: true },
     });
 
-    if (!user) {
+    if (!user?.cart) {
       throw ErroApi.BadRequestError("Пользователь не найден");
     }
 
     // Если у пользователя нет корзины, создаем ее,
     // хотя такого быть не должно тк при регистрации корзина создается автоматом.
     // Хотя если пользователь не зареган то можно сделать так
+
     let cart = user.cart!;
 
-    // if (!cart) {
-    //   cart = await prisma.cart.create({
-    //     data: {
-    //       userId,
-    //       token: uuidv4(),
-    //       totalAmount: 0,
-    //     },
-    //   });
-    // }
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      throw ErroApi.BadRequestError("Товар не найден");
+    }
+
+    const productItem = await prisma.productItem.findFirst({
+      where: { productId: product.id },
+    });
+
+    if (!productItem) {
+      throw ErroApi.BadRequestError(
+        "У товара нет доступных вариантов (ProductItem)",
+      );
+    }
 
     // Проверяем, существует ли товар в корзине
-    const existingCartItem = await prisma.cartItem.findFirst({
+    const existingCartProduct = await prisma.cartItem.findFirst({
       where: {
         cartId: cart.id,
-        productItemId,
+        productItemId: productItem.id,
       },
     });
 
-    if (existingCartItem) {
+    if (existingCartProduct) {
       // Если товар уже в корзине, увеличиваем количество
       const updatedItem = await prisma.cartItem.update({
-        where: { id: existingCartItem.id },
+        where: { id: existingCartProduct.id },
         data: {
-          quantity: existingCartItem.quantity + quantity,
+          quantity: existingCartProduct.quantity + quantity,
         },
         include: {
           productItem: true,
@@ -65,14 +73,12 @@ class CartService {
       await this.updateCartTotal(cart.id);
       return updatedItem;
     } else {
-      console.log(" я попал в else"); //ОШИБКА ТУТ
-      // PrismaClientKnownRequestError:
-      // Invalid `prisma.cartItem.create()` invocation in
+      //ОШИБКА ТУТ
       // Если товара нет в корзине, создаем новую запись
       const newItem = await prisma.cartItem.create({
         data: {
           cartId: cart.id,
-          productItemId,
+          productItemId: productItem.id,
           quantity,
         },
         include: {
@@ -119,3 +125,10 @@ class CartService {
 }
 
 export const cartService = new CartService();
+
+// "user": {
+//   "email": "eu0vs@sharebot.net",
+//   "id": 10,
+//   "isActivated": true,
+//   "role": "USER"
+// }
