@@ -103,14 +103,11 @@ class TokenService {
 
   decodeToken(token: string) {
     try {
-      // Разделяем токен на части (header.payload.signature)
       const [headerB64, payloadB64] = token.split(".");
-
       // Декодируем payload из Base64
       const payload = JSON.parse(
         Buffer.from(payloadB64, "base64").toString("utf-8"),
       );
-
       return payload;
     } catch (error) {
       console.error("Ошибка декодирования JWT:", error);

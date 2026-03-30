@@ -3,9 +3,20 @@ import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../lib/prisma";
 
 class CartService {
-  async getCart(id: number) {
+  async getCart(userId: number) {
     const cart = await prisma.cart.findUnique({
-      where: { id },
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            productItem: {
+              include: {
+                product: true, // включая продукт
+              },
+            },
+          },
+        },
+      },
     });
     return cart;
   }
@@ -15,7 +26,7 @@ class CartService {
     productId: number,
     quantity: number = 1,
   ) {
-    // Проверяем, существует ли пользователь
+    // существует ли пользователь
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: { cart: true },
@@ -92,6 +103,7 @@ class CartService {
     }
   }
 
+  // тут переписать тк в removeProductInCart тоже нужно использовать updateCartTotal
   private async updateCartTotal(cartId: number) {
     // Получаем все товары в корзине
     const cartItems = await prisma.cartItem.findMany({
@@ -113,7 +125,51 @@ class CartService {
     });
   }
 
-  async removeProductInCart() {}
+  async removeProductInCart(userId: number, cartItemId: number) {
+    // Проверяем, что корзина принадлежит текущему пользователю
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: { items: true },
+    });
+
+    if (!cart) {
+      throw ErroApi.BadRequestError("Корзина не найдена");
+    }
+
+    // Проверяем, есть ли такой CartItem в корзине
+    const cartItem = await prisma.cartItem.findUnique({
+      where: { id: cartItemId },
+    });
+
+    if (!cartItem || cartItem.cartId !== cart.id) {
+      throw ErroApi.BadRequestError(
+        "Товар не найден в корзине или принадлежит другой корзине",
+      );
+    }
+
+    // Удаляем CartItem
+    await prisma.cartItem.delete({ where: { id: cartItemId } });
+
+    // Обновляем totalAmount корзины
+    const remainingItems = await prisma.cartItem.findMany({
+      where: { cartId: cart.id },
+      include: { productItem: { include: { product: true } } },
+    });
+
+    const newTotalAmount = remainingItems.reduce((sum, item) => {
+      return sum + item.quantity * (item.productItem.product.price || 0);
+    }, 0);
+
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: { totalAmount: newTotalAmount },
+    });
+
+    return {
+      message: "Товар удален и сумма обновлена",
+      totalAmount: newTotalAmount,
+    };
+  }
 
   async makeOnOrder() {}
 
@@ -125,10 +181,3 @@ class CartService {
 }
 
 export const cartService = new CartService();
-
-// "user": {
-//   "email": "eu0vs@sharebot.net",
-//   "id": 10,
-//   "isActivated": true,
-//   "role": "USER"
-// }

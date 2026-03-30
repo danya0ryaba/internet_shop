@@ -25,7 +25,7 @@ app.use("/api", router);
 app.use(errorMiddleware);
 
 async function users() {
-  const users = await prisma.user.findMany();
+  const users = await prisma.product.findMany();
   console.log(users);
 }
 
@@ -70,5 +70,5 @@ async function users() {
 
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
-  // users();
+  users();
 });
