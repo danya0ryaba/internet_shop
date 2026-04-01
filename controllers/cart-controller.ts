@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { cartService } from "../service/cart-service";
 import { ErroApi } from "../exeptions/error-api";
 import { tokenService } from "../service/token-service";
+import { getIdFromJWT } from "../lib/getIdFromJwt";
 
 class Cart {
   // нужно реализовать чтобы была корзина без регистрации?
@@ -9,27 +10,7 @@ class Cart {
 
   async getCart(req: Request, res: Response, next: NextFunction) {
     try {
-      const authorizetionHeader = req.headers.authorization;
-      if (!authorizetionHeader) {
-        return next(ErroApi.UnauthorizenError());
-      }
-
-      const accessToken = authorizetionHeader.split(" ")[1];
-
-      if (!accessToken) {
-        return next(ErroApi.UnauthorizenError());
-      }
-
-      const user = tokenService.decodeToken(accessToken);
-
-      if (!user) {
-        return next(ErroApi.UnauthorizenError());
-      }
-      const userId = user.id;
-
-      if (isNaN(userId)) {
-        return res.status(400).json({ error: "id пользователя не валидный" });
-      }
+      const userId = getIdFromJWT(req, res, next);
 
       const cart = await cartService.getCart(userId);
 
@@ -65,23 +46,24 @@ class Cart {
   async addProductInCart(req: Request, res: Response, next: NextFunction) {
     try {
       // достаю id пользователя из JWT, наверное, стоит написать функцию которая будет это делать
-      const authorizetionHeader = req.headers.authorization;
-      if (!authorizetionHeader) {
-        return next(ErroApi.UnauthorizenError());
-      }
+      // const authorizetionHeader = req.headers.authorization;
+      // if (!authorizetionHeader) {
+      //   return next(ErroApi.UnauthorizenError());
+      // }
 
-      const accessToken = authorizetionHeader.split(" ")[1];
+      // const accessToken = authorizetionHeader.split(" ")[1];
 
-      if (!accessToken) {
-        return next(ErroApi.UnauthorizenError());
-      }
+      // if (!accessToken) {
+      //   return next(ErroApi.UnauthorizenError());
+      // }
 
-      const user = tokenService.decodeToken(accessToken);
+      // const user = tokenService.decodeToken(accessToken);
 
-      if (!user) {
-        return next(ErroApi.UnauthorizenError());
-      }
-      const userId = user.id;
+      // if (!user) {
+      //   return next(ErroApi.UnauthorizenError());
+      // }
+      // const userId = user.id;
+      const userId = getIdFromJWT(req, res, next);
 
       const productId = parseInt(req.params.id as string);
 
@@ -108,28 +90,9 @@ class Cart {
 
   async removeProductInCart(req: Request, res: Response, next: NextFunction) {
     try {
-      // достаю id пользователя из JWT, наверное, стоит написать функцию которая будет это делать
-
-      const authorizetionHeader = req.headers.authorization;
-      if (!authorizetionHeader) {
-        return next(ErroApi.UnauthorizenError());
-      }
-
-      const accessToken = authorizetionHeader.split(" ")[1];
-
-      if (!accessToken) {
-        return next(ErroApi.UnauthorizenError());
-      }
-
-      const user = tokenService.decodeToken(accessToken);
-
-      if (!user) {
-        return next(ErroApi.UnauthorizenError());
-      }
-      const userId = user.id;
+      const userId = getIdFromJWT(req, res, next);
 
       const { id } = req.body;
-      console.log("removeProductInCart id = " + id);
 
       const result = await cartService.removeProductInCart(userId, Number(id));
 

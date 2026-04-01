@@ -32,6 +32,35 @@ class ProductController {
     }
   }
 
+  async getFilterProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { categoryName } = req.params;
+      if (!categoryName) {
+        return res.status(400).json({ error: "Такой категории не существует" });
+      }
+      const filterProduct = await productService.getFilterredProducts(
+        String(categoryName),
+      );
+      return res.json(filterProduct);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async searchProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { name } = req.query;
+      if (!name || typeof name !== "string") {
+        return res.status(400).json({ error: "Требуется поисковый запрос" });
+      }
+
+      const products = await productService.searchProducts(name);
+      return res.json(products);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // только для ADMIN
   async createProduct(req: Request, res: Response, next: NextFunction) {
     try {

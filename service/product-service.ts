@@ -15,9 +15,62 @@ class ProductService {
     return product;
   }
 
-  // на все эти операции повесить middleware чтобы проверял что это делает ADMIN
+  async getFilterredProducts(categoryName: string) {
+    try {
+      const category = await prisma.category.findFirst({
+        where: {
+          name: {
+            equals: categoryName,
+            mode: "insensitive",
+          },
+        },
+        include: {
+          products: true,
+        },
+      });
+
+      if (!category) {
+        throw ErroApi.BadRequestError("Продукты в этой категория не найдена");
+      }
+
+      return category.products;
+    } catch (error) {
+      console.log(error);
+      throw ErroApi.BadRequestError("Не удалось отфильтровать товары");
+    }
+  }
+
+  async searchProducts(searchQuery: string) {
+    try {
+      const products = await prisma.product.findMany({
+        where: {
+          OR: [
+            {
+              name: {
+                contains: searchQuery,
+                mode: "insensitive",
+              },
+            },
+            {
+              description: {
+                contains: searchQuery,
+                mode: "insensitive",
+              },
+            },
+          ],
+        },
+        orderBy: {
+          name: "asc",
+        },
+      });
+
+      return products;
+    } catch (error) {
+      throw ErroApi.BadRequestError("Поиск не удался");
+    }
+  }
+
   async createProduct(body: ProductCreateInput, categoryName: string) {
-    // Найди категорию по ее названию
     const category = await prisma.category.findUnique({
       where: {
         name: categoryName,

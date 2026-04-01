@@ -45,9 +45,13 @@ router.post(
   adminMiddleware,
   productController.deleteProduct,
 );
+// фильтрация продуктов
+router.get("/product/filter/:categoryName", productController.getFilterProduct);
+// поиск продукта (GET /product/search?name=картофель)
+router.get("/product-search/", productController.searchProduct);
 
 // cart
-// нужно переписать чтобы id user доставать из jwt, может как middleware?
+// может переписать чтобы id user доставать из jwt, может как middleware?
 router.get("/cart", cartController.getCart);
 router.get("/cart-add-product/:id", cartController.addProductInCart);
 router.post("/cart-remove-product", cartController.removeProductInCart);

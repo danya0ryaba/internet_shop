@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { router } from "./router";
 import { errorMiddleware } from "./middlewares/error-midleware";
 import { prisma } from "./lib/prisma";
+import { OrderStatus } from "./generated/prisma/enums";
 
 config();
 
@@ -25,50 +26,31 @@ app.use("/api", router);
 app.use(errorMiddleware);
 
 async function users() {
-  const users = await prisma.product.findMany();
+  const users = await prisma.category.findMany();
   console.log(users);
 }
-
-// [
-//   {
-//     id: 2,
-//     name: 'Овощи',
-//     createdAt: 2026-03-27T06:44:34.904Z,
-//     updatedAt: 2026-03-27T06:44:34.904Z
-//   },
-//   {
-//     id: 3,
-//     name: 'Цветы',
-//     createdAt: 2026-03-27T06:44:34.904Z,
-//     updatedAt: 2026-03-27T06:44:34.904Z
-//   },
-//   {
-//     id: 4,
-//     name: 'Зелень и травы',
-//     createdAt: 2026-03-27T06:44:34.904Z,
-//     updatedAt: 2026-03-27T06:44:34.904Z
-//   },
-//   {
-//     id: 5,
-//     name: 'Грибы',
-//     createdAt: 2026-03-27T06:44:34.904Z,
-//     updatedAt: 2026-03-27T06:44:34.904Z
-//   },
-//   {
-//     id: 6,
-//     name: 'Ягоды',
-//     createdAt: 2026-03-27T06:44:34.904Z,
-//     updatedAt: 2026-03-27T06:44:34.904Z
-//   },
-//   {
-//     id: 7,
-//     name: 'Другое',
-//     createdAt: 2026-03-27T06:44:34.904Z,
-//     updatedAt: 2026-03-27T06:44:34.904Z
-//   }
-// ]
-
+async function createOrder() {
+  try {
+    const torederUser = await prisma.order.create({
+      data: {
+        token: "123",
+        totalAmount: 1500,
+        status: OrderStatus.PENDING,
+        paymentId: "12",
+        items: [],
+        fullName: "String",
+        email: "String",
+        phone: "String",
+        address: "String",
+        comment: "String",
+      },
+    });
+    console.log(torederUser);
+  } catch (error) {
+    console.log("словил маслину");
+  }
+}
+// переписать category Зелень и травы чтобы было без пробелов
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
-  users();
 });
