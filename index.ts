@@ -53,4 +53,5 @@ async function createOrder() {
 // переписать category Зелень и травы чтобы было без пробелов
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
+  // createOrder()
 });

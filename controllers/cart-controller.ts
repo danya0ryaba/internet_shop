@@ -45,24 +45,6 @@ class Cart {
 
   async addProductInCart(req: Request, res: Response, next: NextFunction) {
     try {
-      // достаю id пользователя из JWT, наверное, стоит написать функцию которая будет это делать
-      // const authorizetionHeader = req.headers.authorization;
-      // if (!authorizetionHeader) {
-      //   return next(ErroApi.UnauthorizenError());
-      // }
-
-      // const accessToken = authorizetionHeader.split(" ")[1];
-
-      // if (!accessToken) {
-      //   return next(ErroApi.UnauthorizenError());
-      // }
-
-      // const user = tokenService.decodeToken(accessToken);
-
-      // if (!user) {
-      //   return next(ErroApi.UnauthorizenError());
-      // }
-      // const userId = user.id;
       const userId = getIdFromJWT(req, res, next);
 
       const productId = parseInt(req.params.id as string);
@@ -101,8 +83,6 @@ class Cart {
       next(error);
     }
   }
-
-  async makeOnOrder(req: Request, res: Response, next: NextFunction) {}
 
   async getAllCarts(req: Request, res: Response, next: NextFunction) {
     try {

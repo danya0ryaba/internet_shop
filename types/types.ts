@@ -1,3 +1,6 @@
+import { OrderStatus } from "../generated/prisma/enums";
+
+// не использую ...
 export interface IUser {
   id: number;
   email: string;
@@ -25,3 +28,19 @@ export interface ProductCreateInput {
 export type ProductWithId = ProductCreateInput & {
   id: number;
 };
+
+export interface IOrder {
+  phone: string;
+  address: string;
+  comment?: string;
+  email: string;
+  fullName: string;
+  paymentId: string;
+  status: OrderStatus;
+  totalAmount: number;
+  token: string;
+  items: {
+    productItemId: number;
+    quantity: number;
+  }[];
+}

@@ -74,6 +74,7 @@ model ProductItem {
     size      Int?
 
     cartItems CartItem[]
+    orderItems OrderItem[]
 
     product   Product @relation(fields: [productId], references: [id])
     productId Int
@@ -122,7 +123,7 @@ model Order {
     status      OrderStatus
     paymentId   String?
 
-    items Json
+    items OrderItem[]
 
     fullName String
     email    String
@@ -133,6 +134,19 @@ model Order {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   Int
+  productItemId Int
+  productItem ProductItem @relation(fields: [productItemId], references: [id])
+  quantity  Int
+  price     Int
+  size      Int?
+  createdAt DateTime @default(now())
+}
+
 
 model Story {
     id              Int    @id @default(autoincrement())

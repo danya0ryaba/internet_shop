@@ -1,17 +1,20 @@
+import { UserRole } from "../generated/prisma/enums";
+import { IOrder } from "../types/types";
+
 export interface IModelDTO {
   email: string;
   id: number;
   isActivated: boolean;
   order?: unknown;
-  role: "ADMIN" | "USER";
+  role: UserRole;
 }
 
 export class UserDTO implements IModelDTO {
   email: string;
   id: number;
   isActivated: boolean;
-  order?: unknown;
-  role: "ADMIN" | "USER";
+  order?: IOrder;
+  role: UserRole;
 
   constructor(model: IModelDTO) {
     this.email = model.email;

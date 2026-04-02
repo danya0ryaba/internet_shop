@@ -5,6 +5,7 @@ import { productController } from "../controllers/product-controller";
 import { cartController } from "../controllers/cart-controller";
 import { authMiddleware } from "../middlewares/auth-middleware";
 import { adminMiddleware } from "../middlewares/admin-middleware";
+import { orderController } from "../controllers/order-controller";
 
 export const router = Router();
 
@@ -59,6 +60,16 @@ router.post("/cart-remove-product", cartController.removeProductInCart);
 router.get("/cart-get-all-carts", adminMiddleware, cartController.getAllCarts);
 
 // не совсем понимаю как сделать логику заказа
-router.post("/cart-make-on-order", cartController.makeOnOrder);
+router.post(
+  "/cart-make-on-order",
+  body("email").isEmail(),
+  body("phone").isMobilePhone("ru-RU"),
+  // authMiddleware,
+  orderController.createOrder,
+);
 
 // + может быть логику сброса пароля?
+
+// "fullName":"danya",
+//   "email":"au3t7@sharebot.net",
+//   "password":"12345"
