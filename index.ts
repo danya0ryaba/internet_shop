@@ -25,27 +25,10 @@ app.use("/api", router);
 
 app.use(errorMiddleware);
 
-async function users() {
-  const users = await prisma.category.findMany();
-  console.log(users);
-}
-async function createOrder() {
+async function showOrder() {
   try {
-    const torederUser = await prisma.order.create({
-      data: {
-        token: "123",
-        totalAmount: 1500,
-        status: OrderStatus.PENDING,
-        paymentId: "12",
-        items: [],
-        fullName: "String",
-        email: "String",
-        phone: "String",
-        address: "String",
-        comment: "String",
-      },
-    });
-    console.log(torederUser);
+    const showOrder = await prisma.order.findMany();
+    console.log(showOrder);
   } catch (error) {
     console.log("словил маслину");
   }
@@ -53,5 +36,6 @@ async function createOrder() {
 // переписать category Зелень и травы чтобы было без пробелов
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
-  // createOrder()
+  showOrder();
+  // users();
 });

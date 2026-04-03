@@ -68,8 +68,10 @@ router.post(
   orderController.createOrder,
 );
 
+router.get("/cart-show-order", orderController.showOrder);
+
 // + может быть логику сброса пароля?
 
-// "fullName":"danya",
-//   "email":"au3t7@sharebot.net",
+// "fullName":"fullName",
+//   "email":"s3p7e@sharebot.net",
 //   "password":"12345"
