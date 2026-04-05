@@ -47,9 +47,13 @@ class OrderService {
         userId: userId,
         items: {
           create: items.map((item) => {
-            const cartItem = cart.items.find(
-              (ci: any) => ci.productItemId === item.productItemId,
-            );
+            console.log("item = ");
+            console.log(item);
+            const cartItem = cart.items.find((ci: any) => {
+              console.log("ci.productItemId = ");
+              console.log(ci.productItemId);
+              return ci.productItemId === item.productItemId;
+            });
             if (!cartItem?.productItem) {
               throw new Error(
                 `ProductItem с id ${item.productItemId} не найден в базе`,
@@ -96,7 +100,54 @@ class OrderService {
     return order;
   }
 
-  async showOrder(userId: number) {}
+  async showOrder(userId: number) {
+    return prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        items: {
+          include: {
+            productItem: {
+              include: { product: true }, // чтобы вернуть имя, изображение и т.д.
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async allOrders() {
+    const orders = await prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+          },
+        },
+        items: {
+          include: {
+            productItem: {
+              include: {
+                product: {
+                  // что именно заказали
+                  select: {
+                    id: true,
+                    name: true,
+                    imageUrl: true,
+                    description: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return orders;
+  }
 }
 
 export const orderService = new OrderService();

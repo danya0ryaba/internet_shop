@@ -27,7 +27,11 @@ app.use(errorMiddleware);
 
 async function showOrder() {
   try {
-    const showOrder = await prisma.order.findMany();
+    const showOrder = await prisma.order.findFirst({
+      where: {
+        userId: 17,
+      },
+    });
     console.log(showOrder);
   } catch (error) {
     console.log("словил маслину");
@@ -36,6 +40,6 @@ async function showOrder() {
 // переписать category Зелень и травы чтобы было без пробелов
 app.listen(PORT, () => {
   console.log(`Server started on PORT = ${PORT}`);
-  showOrder();
+  // showOrder();
   // users();
 });

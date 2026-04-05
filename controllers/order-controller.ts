@@ -57,16 +57,21 @@ class OrderController {
       const userId = getIdFromJWT(req, res, next);
 
       if (!userId) {
-        throw ErroApi.BadRequestError("Авторизуйтесь на сайте");
+        throw ErroApi.UnauthorizenError();
       }
 
       const orders = await orderService.showOrder(userId);
 
-      return res.status(201).json({
-        success: true,
-        message: "Ваши заказы",
-        data: orders,
-      });
+      return res.json({ success: true, message: "Ваши заказы", data: orders });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async allOrders(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orders = await orderService.allOrders();
+      return res.json({ success: true, message: "Все заказы", data: orders });
     } catch (error) {
       next(error);
     }
@@ -75,7 +80,7 @@ class OrderController {
 
 export const orderController = new OrderController();
 
-// Пример данны, которые нужны для заказа!
+// Пример данных, которые нужны для заказа!
 // {
 //   "phone": "79771221299",
 //   "address": "solik",
@@ -88,6 +93,10 @@ export const orderController = new OrderController();
 //   "token": "123",
 //   "items": [{
 //     "productItemId": 5, // самого продукта productItem
+
+// то есть создается корзина при регистрации и когда пользователь
+// добавляет первый продукт в корзину то, productItem === 1 у следующего productItem === 2 и тд
+
 //     "quantity": 1
 //   }]
 // }

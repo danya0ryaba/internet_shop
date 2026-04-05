@@ -46,6 +46,9 @@ router.post(
   adminMiddleware,
   productController.deleteProduct,
 );
+// админ должен иметь возможность смотреть заказы
+router.get("/show-all-orders", adminMiddleware, orderController.allOrders);
+
 // фильтрация продуктов
 router.get("/product/filter/:categoryName", productController.getFilterProduct);
 // поиск продукта (GET /product/search?name=картофель)
@@ -57,7 +60,11 @@ router.get("/cart", cartController.getCart);
 router.get("/cart-add-product/:id", cartController.addProductInCart);
 router.post("/cart-remove-product", cartController.removeProductInCart);
 // может не нужно, хз?
-router.get("/cart-get-all-carts", adminMiddleware, cartController.getAllCarts);
+router.get(
+  "/cart-get-all-carts",
+  // adminMiddleware,
+  cartController.getAllCarts,
+);
 
 // не совсем понимаю как сделать логику заказа
 router.post(
@@ -71,7 +78,3 @@ router.post(
 router.get("/cart-show-order", orderController.showOrder);
 
 // + может быть логику сброса пароля?
-
-// "fullName":"fullName",
-//   "email":"s3p7e@sharebot.net",
-//   "password":"12345"
