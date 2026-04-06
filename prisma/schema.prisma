@@ -105,6 +105,7 @@ model CartItem {
     productItemId Int
 
     quantity Int @default(1)
+    selected       Boolean     @default(false) 
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

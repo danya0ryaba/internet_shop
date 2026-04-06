@@ -66,15 +66,28 @@ router.get(
   cartController.getAllCarts,
 );
 
-// не совсем понимаю как сделать логику заказа
+// выбрать в корзине товар, чтобы изменить его selected CartItem
+
+router.post("cart-select-product", cartController.selectProduct);
+
+// сделать заказ
 router.post(
   "/cart-make-on-order",
-  body("email").isEmail(),
-  body("phone").isMobilePhone("ru-RU"),
   // authMiddleware,
+  // body("email").isEmail(),
+  // body("phone").isMobilePhone("ru-RU"),
+  [
+    body("email").isEmail(),
+    body("phone").isMobilePhone("ru-RU"),
+    body("fullName").notEmpty(),
+    body("address").notEmpty(),
+    body("token").notEmpty(),
+  ],
   orderController.createOrder,
 );
 
 router.get("/cart-show-order", orderController.showOrder);
 
 // + может быть логику сброса пароля?
+
+// + Оплата через Юкасса

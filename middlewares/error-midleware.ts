@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 
 export function errorMiddleware(
   err: unknown,
@@ -8,7 +8,7 @@ export function errorMiddleware(
   next: NextFunction,
 ) {
   console.log(err);
-  if (err instanceof ErroApi) {
+  if (err instanceof ErrorApi) {
     return res
       .status(err.status)
       .json({ message: err.message, errprs: err.errors });

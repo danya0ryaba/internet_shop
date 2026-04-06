@@ -1,4 +1,4 @@
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { prisma } from "../lib/prisma";
 import { ProductCreateInput, ProductWithId } from "../types/types";
 
@@ -30,13 +30,13 @@ class ProductService {
       });
 
       if (!category) {
-        throw ErroApi.BadRequestError("Продукты в этой категория не найдена");
+        throw ErrorApi.BadRequestError("Продукты в этой категория не найдена");
       }
 
       return category.products;
     } catch (error) {
       console.log(error);
-      throw ErroApi.BadRequestError("Не удалось отфильтровать товары");
+      throw ErrorApi.BadRequestError("Не удалось отфильтровать товары");
     }
   }
 
@@ -66,7 +66,7 @@ class ProductService {
 
       return products;
     } catch (error) {
-      throw ErroApi.BadRequestError("Поиск не удался");
+      throw ErrorApi.BadRequestError("Поиск не удался");
     }
   }
 
@@ -81,7 +81,7 @@ class ProductService {
     });
 
     if (!category?.id) {
-      throw ErroApi.BadRequestError("Такой категории не существует");
+      throw ErrorApi.BadRequestError("Такой категории не существует");
     }
 
     const newProduct = await prisma.product.create({
@@ -111,7 +111,7 @@ class ProductService {
     });
 
     if (!updateProduct) {
-      throw ErroApi.BadRequestError("Ошибка при обновлении продукта");
+      throw ErrorApi.BadRequestError("Ошибка при обновлении продукта");
     }
 
     return updateProduct;

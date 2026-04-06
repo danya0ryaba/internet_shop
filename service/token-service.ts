@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma";
 import { IModelDTO } from "../dtos/user-dto";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { JwtPayload } from "jsonwebtoken";
 
 class TokenService {
@@ -53,7 +53,7 @@ class TokenService {
     });
 
     if (!token) {
-      throw ErroApi.BadRequestError("Токен не найден");
+      throw ErrorApi.BadRequestError("Токен не найден");
     }
     return token;
   }
@@ -64,7 +64,7 @@ class TokenService {
     });
 
     if (!token) {
-      throw ErroApi.BadRequestError("Токен не найден");
+      throw ErrorApi.BadRequestError("Токен не найден");
     }
     return token;
   }

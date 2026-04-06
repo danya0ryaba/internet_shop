@@ -1,4 +1,4 @@
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../lib/prisma";
 
@@ -33,7 +33,7 @@ class CartService {
     });
 
     if (!user?.cart) {
-      throw ErroApi.BadRequestError("Пользователь не найден");
+      throw ErrorApi.BadRequestError("Пользователь не найден");
     }
 
     // Если у пользователя нет корзины, создаем ее,
@@ -47,7 +47,7 @@ class CartService {
     });
 
     if (!product) {
-      throw ErroApi.BadRequestError("Товар не найден");
+      throw ErrorApi.BadRequestError("Товар не найден");
     }
 
     const productItem = await prisma.productItem.findFirst({
@@ -55,7 +55,7 @@ class CartService {
     });
 
     if (!productItem) {
-      throw ErroApi.BadRequestError(
+      throw ErrorApi.BadRequestError(
         "У товара нет доступных вариантов (ProductItem)",
       );
     }
@@ -133,7 +133,7 @@ class CartService {
     });
 
     if (!cart) {
-      throw ErroApi.BadRequestError("Корзина не найдена");
+      throw ErrorApi.BadRequestError("Корзина не найдена");
     }
 
     // Проверяем, есть ли такой CartItem в корзине
@@ -142,7 +142,7 @@ class CartService {
     });
 
     if (!cartItem || cartItem.cartId !== cart.id) {
-      throw ErroApi.BadRequestError(
+      throw ErrorApi.BadRequestError(
         "Товар не найден в корзине или принадлежит другой корзине",
       );
     }
@@ -177,6 +177,16 @@ class CartService {
   async getAllCarts() {
     const allCarts = prisma.cart.findMany();
     return allCarts;
+  }
+
+  async selectProduct(id: number) {
+    const current = await prisma.cartItem.findUnique({ where: { id } });
+    if (!current) throw ErrorApi.BadRequestError("CartItem не найден");
+
+    return prisma.cartItem.update({
+      where: { id },
+      data: { selected: !current.selected },
+    });
   }
 }
 

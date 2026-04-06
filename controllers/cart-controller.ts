@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { cartService } from "../service/cart-service";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { tokenService } from "../service/token-service";
 import { getIdFromJWT } from "../lib/getIdFromJwt";
 
@@ -52,7 +52,7 @@ class Cart {
       const quantity = parseInt(req.body.quantity) || 1;
 
       if (isNaN(productId)) {
-        throw ErroApi.BadRequestError("Некорректный ID товара");
+        throw ErrorApi.BadRequestError("Некорректный ID товара");
       }
 
       const cartItem = await cartService.addProductInCart(
@@ -90,6 +90,17 @@ class Cart {
       return res.json(carts);
     } catch (error) {
       console.log(error);
+      next(error);
+    }
+  }
+
+  async selectProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.body;
+
+      const selectProduct = await cartService.selectProduct(id);
+      return res.json(selectProduct);
+    } catch (error) {
       next(error);
     }
   }

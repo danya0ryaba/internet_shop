@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserRole } from "../generated/prisma/enums";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { tokenService } from "../service/token-service";
 
 // @ts-ignore
@@ -22,19 +22,19 @@ export const adminMiddleware = (
 ) => {
   const authorizetionHeader = req.headers.authorization;
   if (!authorizetionHeader) {
-    return next(ErroApi.UnauthorizenError());
+    return next(ErrorApi.UnauthorizenError());
   }
 
   const accessToken = authorizetionHeader.split(" ")[1];
 
   if (!accessToken) {
-    return next(ErroApi.UnauthorizenError());
+    return next(ErrorApi.UnauthorizenError());
   }
 
   const user = tokenService.decodeToken(accessToken);
 
   if (!user) {
-    return next(ErroApi.UnauthorizenError());
+    return next(ErrorApi.UnauthorizenError());
   }
 
   if (user.role !== UserRole.ADMIN) {

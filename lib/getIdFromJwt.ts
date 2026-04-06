@@ -1,23 +1,23 @@
 import { Request, Response, NextFunction } from "express";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { tokenService } from "../service/token-service";
 
 export function getIdFromJWT(req: Request, res: Response, next: NextFunction) {
   const authorizetionHeader = req.headers.authorization;
   if (!authorizetionHeader) {
-    return next(ErroApi.UnauthorizenError());
+    return next(ErrorApi.UnauthorizenError());
   }
 
   const accessToken = authorizetionHeader.split(" ")[1];
 
   if (!accessToken) {
-    return next(ErroApi.UnauthorizenError());
+    return next(ErrorApi.UnauthorizenError());
   }
 
   const user = tokenService.decodeToken(accessToken);
 
   if (!user) {
-    return next(ErroApi.UnauthorizenError());
+    return next(ErrorApi.UnauthorizenError());
   }
   const userId = user.id;
   if (isNaN(userId)) {

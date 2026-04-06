@@ -1,54 +1,80 @@
 import { Request, Response, NextFunction } from "express";
 import { orderService } from "../service/order-service";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 import { IOrder } from "../types/types";
 import { getIdFromJWT } from "../lib/getIdFromJwt";
 import { prisma } from "../lib/prisma";
 
 class OrderController {
   async createOrder(req: Request, res: Response, next: NextFunction) {
+    // try {
+    //   const {
+    //     email,
+    //     phone,
+    //     fullName,
+    //     address,
+    //     totalAmount,
+    //     status,
+    //     token,
+    //     items,
+    //   } = req.body as IOrder;
+
+    //   if (
+    //     !phone ||
+    //     !address ||
+    //     !email ||
+    //     !fullName ||
+    //     !items ||
+    //     !token ||
+    //     !totalAmount ||
+    //     !status
+    //   ) {
+    //     throw ErrorApi.BadRequestError(
+    //       "Не все данные переданы для оформления заказа",
+    //     );
+    //   }
+
+    //   const userId = getIdFromJWT(req, res, next);
+
+    //   if (!userId) {
+    //     throw ErrorApi.BadRequestError("Авторизуйтесь на сайте");
+    //   }
+
+    //   const order = await orderService.createOrder(userId, req.body);
+
+    //   return res.status(201).json({
+    //     success: true,
+    //     message: "Заказ успешно создан",
+    //     data: order,
+    //   });
+    // } catch (error) {
+    //   next(error);
+    // }
+
     try {
-      const {
+      const userId = getIdFromJWT(req, res, next);
+      if (!userId) throw ErrorApi.UnauthorizenError();
+
+      const { email, phone, fullName, address, comment, paymentId, token } =
+        req.body;
+
+      const order = await orderService.createOrder(userId, {
         email,
         phone,
         fullName,
         address,
-        totalAmount,
-        status,
+        comment,
+        paymentId,
         token,
-        items,
-      } = req.body as IOrder;
+      });
 
-      if (
-        !phone ||
-        !address ||
-        !email ||
-        !fullName ||
-        !items ||
-        !token ||
-        !totalAmount ||
-        !status
-      ) {
-        throw ErroApi.BadRequestError(
-          "Не все данные переданы для оформления заказа",
-        );
-      }
-
-      const userId = getIdFromJWT(req, res, next);
-
-      if (!userId) {
-        throw ErroApi.BadRequestError("Авторизуйтесь на сайте");
-      }
-
-      const order = await orderService.createOrder(userId, req.body);
-
-      return res.status(201).json({
+      res.status(201).json({
         success: true,
         message: "Заказ успешно создан",
         data: order,
       });
-    } catch (error) {
-      next(error);
+    } catch (e) {
+      next(e);
     }
   }
 
@@ -57,7 +83,7 @@ class OrderController {
       const userId = getIdFromJWT(req, res, next);
 
       if (!userId) {
-        throw ErroApi.UnauthorizenError();
+        throw ErrorApi.UnauthorizenError();
       }
 
       const orders = await orderService.showOrder(userId);
@@ -99,4 +125,24 @@ export const orderController = new OrderController();
 
 //     "quantity": 1
 //   }]
+// }
+
+// {
+//   "id": 10,
+//   "userId": 18,
+//   "totalAmount": 50,
+//   "items": [
+//     {
+//       "id": 31,
+//       "quantity": 1,
+//       "product": {
+//         "id": 10,
+//         "name": "Свежие огурцы",
+//         "imageUrl": "https://example.com/cucumbers.jpg",
+//         "description": "Свежие огурцы, выращенные в домашних условиях.",
+//         "price": 50,
+//         "size": null
+//       }
+//     }
+//   ]
 // }

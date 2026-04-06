@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { mailService } from "./mail-service";
 import { tokenService } from "./token-service";
 import { UserDTO } from "../dtos/user-dto";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
 
 class UserService {
   async registration(fullName: string, email: string, password: string) {
@@ -13,7 +13,7 @@ class UserService {
     });
 
     if (candidate) {
-      throw ErroApi.BadRequestError(
+      throw ErrorApi.BadRequestError(
         "Пользователь с таким email уже существует",
       );
     }
@@ -40,15 +40,6 @@ class UserService {
       },
     });
 
-    // создания корзины пользователя
-    // await prisma.cart.create({
-    //   data: {
-    //     user: { connect: { id: user.id } },
-    //     totalAmount: 0,
-    //     token: activationLink,
-    //   },
-    // });
-
     // письмо на email
     await mailService.sendActivationMail(
       email,
@@ -72,7 +63,7 @@ class UserService {
     });
 
     if (!updatedUser) {
-      throw ErroApi.BadRequestError("Некорректная ссылка активации");
+      throw ErrorApi.BadRequestError("Некорректная ссылка активации");
     }
 
     return updatedUser; // опционально: вернуть обновлённого пользователя
@@ -92,13 +83,13 @@ class UserService {
     });
 
     if (!user) {
-      throw ErroApi.BadRequestError("Пользователь с таким email не обнаружен");
+      throw ErrorApi.BadRequestError("Пользователь с таким email не обнаружен");
     }
 
     // нужно сравнить пароли
     const isPassEquals = await bcrypt.compare(password, user.password);
     if (!isPassEquals) {
-      throw ErroApi.BadRequestError("Неверный пароль");
+      throw ErrorApi.BadRequestError("Неверный пароль");
     }
 
     const userDTO = new UserDTO(user);
@@ -118,7 +109,7 @@ class UserService {
 
   async refresh(refreshToken: string) {
     if (!refreshToken) {
-      throw ErroApi.UnauthorizenError();
+      throw ErrorApi.UnauthorizenError();
     }
     // валидация токена
     const userData = tokenService.validateRefreshToken(refreshToken);
@@ -126,18 +117,18 @@ class UserService {
     const tokenFromDB = await tokenService.findToken(refreshToken);
 
     if (!tokenFromDB) {
-      throw ErroApi.BadRequestError("Refresh token не найден в базе");
+      throw ErrorApi.BadRequestError("Refresh token не найден в базе");
     }
 
     // Проверка: совпадает ли id из токена с id в БД (защита от подмены)
     // if (tokenFromDB.userId !== userData?.id) {
-    //   throw ErroApi.BadRequestError(
+    //   throw ErrorApi.BadRequestError(
     //     "Несоответствие пользователя в токене и базе",
     //   );
     // }
     // проверка чтобы обе операции были успешны
     if (!userData || !tokenFromDB) {
-      throw ErroApi.UnauthorizenError();
+      throw ErrorApi.UnauthorizenError();
     }
 
     // если все хорошо то, генерирую новую пару токенов

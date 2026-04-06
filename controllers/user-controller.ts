@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "../service/user-service";
 import { validationResult } from "express-validator";
-import { ErroApi } from "../exeptions/error-api";
+import { ErrorApi } from "../exeptions/error-api";
+import { IError, IUserDTO } from "../types/types";
 
 class UserController {
   async registration(req: Request, res: Response, next: NextFunction) {
@@ -9,7 +10,7 @@ class UserController {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return next(
-          ErroApi.BadRequestError("Невалидные данные", errors.array()),
+          ErrorApi.BadRequestError("Невалидные данные", errors.array()),
         );
       }
 
@@ -26,15 +27,18 @@ class UserController {
       });
 
       return res.json(userData);
-    } catch (error: any) {
-      next(error);
+    } catch (error) {
+      if (error instanceof ErrorApi) {
+        return next(error);
+      }
+      return next(ErrorApi.BadRequestError("Ошибка регистрации", [error]));
     }
   }
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
-      const userData: any = await userService.login(email, password);
+      const userData: IUserDTO = await userService.login(email, password);
 
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,

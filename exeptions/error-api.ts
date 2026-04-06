@@ -1,4 +1,4 @@
-export class ErroApi extends Error {
+export class ErrorApi extends Error {
   status: number;
   errors: unknown[];
   constructor(status: number, message: string, errors: unknown[]) {
@@ -8,10 +8,10 @@ export class ErroApi extends Error {
   }
 
   static UnauthorizenError() {
-    return new ErroApi(401, "Пользователь не авторизован", []);
+    return new ErrorApi(401, "Пользователь не авторизован", []);
   }
 
   static BadRequestError(message: string, errors: unknown[] = []) {
-    return new ErroApi(400, message, errors);
+    return new ErrorApi(400, message, errors);
   }
 }

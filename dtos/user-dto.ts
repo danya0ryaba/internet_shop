@@ -1,13 +1,5 @@
 import { UserRole } from "../generated/prisma/enums";
-import { IOrder } from "../types/types";
-
-export interface IModelDTO {
-  email: string;
-  id: number;
-  isActivated: boolean;
-  order?: unknown;
-  role: UserRole;
-}
+import { IModelDTO, IOrder } from "../types/types";
 
 export class UserDTO implements IModelDTO {
   email: string;
