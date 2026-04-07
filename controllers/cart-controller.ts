@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { cartService } from "../service/cart-service";
 import { ErrorApi } from "../exeptions/error-api";
-import { tokenService } from "../service/token-service";
 import { getIdFromJWT } from "../lib/getIdFromJwt";
 
 class Cart {
@@ -97,7 +96,6 @@ class Cart {
   async selectProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.body;
-
       const selectProduct = await cartService.selectProduct(id);
       return res.json(selectProduct);
     } catch (error) {

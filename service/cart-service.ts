@@ -171,8 +171,6 @@ class CartService {
     };
   }
 
-  async makeOnOrder() {}
-
   // возиожно только для админа?
   async getAllCarts() {
     const allCarts = prisma.cart.findMany();

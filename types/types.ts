@@ -1,4 +1,3 @@
-import { ErrorApi } from "../exeptions/error-api";
 import { OrderStatus, UserRole } from "../generated/prisma/enums";
 
 // не использую ...
@@ -46,8 +45,6 @@ export interface IOrder {
   }[];
 }
 
-export interface IError extends ErrorApi {}
-
 export interface IModelDTO {
   email: string;
   id: number;
@@ -66,4 +63,15 @@ export interface IUserDTO {
     order?: unknown;
     role: UserRole;
   };
+}
+
+export interface OrderBody {
+  email: string;
+  phone: string;
+  fullName: string;
+  address: string;
+  comment?: string;
+  paymentId?: string;
+  token: string;
+  selectedCartItemIds?: number[];
 }

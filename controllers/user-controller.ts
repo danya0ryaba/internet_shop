@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { userService } from "../service/user-service";
 import { validationResult } from "express-validator";
 import { ErrorApi } from "../exeptions/error-api";
-import { IError, IUserDTO } from "../types/types";
+import { IUserDTO } from "../types/types";
 
 class UserController {
   async registration(req: Request, res: Response, next: NextFunction) {
@@ -73,7 +73,7 @@ class UserController {
       await userService.activate(activationLink);
 
       return res.redirect(String(process.env.CLIENT_URL));
-    } catch (error: any) {
+    } catch (error: unknown) {
       next(error);
     }
   }

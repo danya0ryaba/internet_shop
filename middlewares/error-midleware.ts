@@ -15,5 +15,5 @@ export function errorMiddleware(
   }
   return res
     .status(500)
-    .json({ message: "Непредвиденная ошибка, возможно почта не подтверждена" });
+    .json({ message: "Непредвиденная ошибка, напишите на <почта>" });
 }
