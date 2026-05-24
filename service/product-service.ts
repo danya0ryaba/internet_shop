@@ -4,36 +4,47 @@ import { ProductCreateInput, ProductWithId } from "../types/types";
 
 class ProductService {
   async getAllProducts() {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      include: {
+        category: true,
+      },
+    });
     return products;
   }
 
   async getProductById(id: number) {
-    const product = await prisma.product.findFirst({
-      where: { id },
+    const product = await prisma.product.findUnique({
+      where: { id: Number(id) },
+      include: {
+        category: true,
+        items: true,
+      },
     });
     return product;
   }
 
   async getFilterredProducts(categoryName: string) {
     try {
-      const category = await prisma.category.findFirst({
+      const products = await prisma.product.findMany({
         where: {
-          name: {
-            equals: categoryName,
-            mode: "insensitive",
+          category: {
+            name: {
+              equals: categoryName,
+              mode: "insensitive",
+            },
           },
         },
         include: {
-          products: true,
+          items: true,
+          category: true,
         },
       });
 
-      if (!category) {
-        throw ErrorApi.BadRequestError("Продукты в этой категория не найдена");
+      if (!products.length) {
+        throw ErrorApi.BadRequestError("Продукты в этой категории не найдены");
       }
 
-      return category.products;
+      return products;
     } catch (error) {
       console.log(error);
       throw ErrorApi.BadRequestError("Не удалось отфильтровать товары");
