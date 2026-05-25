@@ -9,7 +9,7 @@ import { orderController } from "../controllers/order-controller";
 import { categoriesController } from "../controllers/categories-controller";
 
 export const router = Router();
-console.log("Router is loaded");
+
 // user
 router.post(
   "/register",
@@ -26,12 +26,7 @@ router.get("/refresh", userController.refresh);
 router.get("/users", authMiddleware, adminMiddleware, userController.getUsers);
 
 // categories
-// router.get("/categories", categoriesController.getCategories);
-
-router.get("/categories", (req, res, next) => {
-  console.log("Роут /categories вызван");
-  categoriesController.getCategories(req, res, next);
-});
+router.get("/categories", categoriesController.getCategories);
 
 // product
 router.get("/product", productController.getProducts);
