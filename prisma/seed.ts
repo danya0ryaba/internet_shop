@@ -3,16 +3,18 @@ import { prisma } from "../lib/prisma";
 
 async function main() {
   // Очистка базы данных
+  await prisma.token.deleteMany(); // Удаляем токены в первую очередь
+  await prisma.orderItem.deleteMany();
+
   await prisma.cartItem.deleteMany();
   await prisma.productItem.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
-  await prisma.token.deleteMany();
-  await prisma.cart.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.story.deleteMany();
   await prisma.storyItem.deleteMany();
+  await prisma.story.deleteMany();
+
+  await prisma.cart.deleteMany();
+  await prisma.user.deleteMany();
 
   // Создаем категории
   const categoriesData = [
@@ -117,6 +119,67 @@ async function main() {
     {
       name: "Клубника",
       imageUrl: "https://example.com/strawberry.jpg",
+      description: "Сладкая домашняя клубника.",
+      price: 100,
+      size: null,
+      categoryId: categoryMap["Ягоды"],
+      items: [
+        { price: 100, size: null },
+        { price: 120, size: null },
+      ],
+    },
+
+    {
+      name: "Свежие огурцы 2",
+      imageUrl: "https://example2.com/cucumbers.jpg",
+      description: "Свежие огурцы, выращенные в домашних условиях.",
+      price: 50,
+      size: null,
+      categoryId: categoryMap["Овощи"],
+      items: [
+        { price: 50, size: null },
+        { price: 60, size: null },
+      ],
+    },
+    {
+      name: "Розы букет 2",
+      imageUrl: "https://example2.com/roses.jpg",
+      description: "Красивый букет из свежих роз.",
+      price: 300,
+      size: null,
+      categoryId: categoryMap["Цветы"],
+      items: [
+        { price: 300, size: null },
+        { price: 350, size: null },
+      ],
+    },
+    {
+      name: "Мята 2",
+      imageUrl: "https://example2.com/mint.jpg",
+      description: "Ароматная свежая мята для чая или десертов.",
+      price: 20,
+      size: null,
+      categoryId: categoryMap["Зелень и травы"],
+      items: [
+        { price: 20, size: null },
+        { price: 25, size: null },
+      ],
+    },
+    {
+      name: "Лесные грибы 2",
+      imageUrl: "https://example2.com/mushrooms.jpg",
+      description: "Свежие лесные грибы, собранные вручную.",
+      price: 150,
+      size: null,
+      categoryId: categoryMap["Грибы"],
+      items: [
+        { price: 150, size: null },
+        { price: 180, size: null },
+      ],
+    },
+    {
+      name: "Клубника 2",
+      imageUrl: "https://example2.com/strawberry.jpg",
       description: "Сладкая домашняя клубника.",
       price: 100,
       size: null,
