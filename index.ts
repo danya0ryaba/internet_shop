@@ -4,8 +4,6 @@ import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import { router } from "./router";
 import { errorMiddleware } from "./middlewares/error-midleware";
-import { prisma } from "./lib/prisma";
-import { OrderStatus } from "./generated/prisma/enums";
 
 config();
 

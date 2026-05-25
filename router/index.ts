@@ -6,9 +6,10 @@ import { cartController } from "../controllers/cart-controller";
 import { authMiddleware } from "../middlewares/auth-middleware";
 import { adminMiddleware } from "../middlewares/admin-middleware";
 import { orderController } from "../controllers/order-controller";
+import { categoriesController } from "../controllers/categories-controller";
 
 export const router = Router();
-
+console.log("Router is loaded");
 // user
 router.post(
   "/register",
@@ -23,6 +24,14 @@ router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
 // доступный только для админ
 router.get("/users", authMiddleware, adminMiddleware, userController.getUsers);
+
+// categories
+// router.get("/categories", categoriesController.getCategories);
+
+router.get("/categories", (req, res, next) => {
+  console.log("Роут /categories вызван");
+  categoriesController.getCategories(req, res, next);
+});
 
 // product
 router.get("/product", productController.getProducts);
