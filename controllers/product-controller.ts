@@ -4,9 +4,14 @@ import { ProductCreateInput } from "../types/types";
 
 class ProductController {
   async getProducts(req: Request, res: Response, next: NextFunction) {
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
     try {
-      const products = await productService.getAllProducts();
-      return res.json(products);
+      const { products, totalCount } = await productService.getAllProducts({
+        page,
+        limit,
+      });
+      return res.json({ products, totalCount, page, limit });
     } catch (error) {
       next(error);
     }

@@ -3,13 +3,17 @@ import { prisma } from "../lib/prisma";
 import { ProductCreateInput, ProductWithId } from "../types/types";
 
 class ProductService {
-  async getAllProducts() {
-    const products = await prisma.product.findMany({
-      include: {
-        category: true,
-      },
-    });
-    return products;
+  async getAllProducts({ page, limit }: { page: number; limit: number }) {
+    const [products, totalCount] = await Promise.all([
+      prisma.product.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { category: true },
+        orderBy: { id: "desc" },
+      }),
+      prisma.product.count(),
+    ]);
+    return { products, totalCount };
   }
 
   async getProductById(id: number) {
