@@ -32,7 +32,7 @@ router.get("/categories", categoriesController.getCategories);
 router.get("/product", productController.getProducts);
 router.get("/product/:id", productController.getProduct);
 router.get("/product/filter/:categoryName", productController.getFilterProduct); // фильтрация продуктов
-router.get("/product-search/", productController.searchProduct); // поиск продукта (GET /product/search?name=картофель)
+router.get("/product-search/", productController.searchProduct); // поиск продукта (GET /product-search?name=картофель)
 
 // только для админа
 router.post(
