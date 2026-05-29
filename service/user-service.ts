@@ -8,65 +8,108 @@ import { ErrorApi } from "../exeptions/error-api";
 
 class UserService {
   async registration(fullName: string, email: string, password: string) {
-    const candidate = await prisma.user.findUnique({
-      where: { email },
-    });
+    // const candidate = await prisma.user.findUnique({
+    //   where: { email },
+    // });
 
+    // if (candidate) {
+    //   throw ErrorApi.BadRequestError(
+    //     "Пользователь с таким email уже существует",
+    //   );
+    // }
+
+    // // хэширую пароль и делаю ссылку для активации
+    // const hashPassword = await bcrypt.hash(password, 5);
+    // const activationLink = uuidv4();
+
+    // const user = await prisma.user.create({
+    //   data: {
+    //     fullName,
+    //     email,
+    //     password: hashPassword,
+    //     activationLink,
+    //     cart: {
+    //       create: {
+    //         token: activationLink, // или другой уникальный токен
+    //         totalAmount: 0,
+    //       },
+    //     },
+    //   },
+    //   include: {
+    //     cart: true, // включаем корзину в ответ, если нужно
+    //   },
+    // });
+
+    // // письмо на email
+    // await mailService.sendActivationMail(
+    //   email,
+    //   `${process.env.API_URL}/api/activate/${activationLink}`,
+    // );
+
+    // // генерирую токены
+    // const userDTO = new UserDTO(user);
+    // const tokens = tokenService.generateToken({ ...userDTO });
+    // // сохраняю refreshToken в бд
+    // await tokenService.saveToken(userDTO.id, tokens.refreshToken);
+    // // возвращаю инфу о пользователи + токены
+    // return { ...tokens, user: userDTO };
+    const candidate = await prisma.user.findUnique({ where: { email } });
     if (candidate) {
       throw ErrorApi.BadRequestError(
         "Пользователь с таким email уже существует",
       );
     }
-
-    // хэширую пароль и делаю ссылку для активации
     const hashPassword = await bcrypt.hash(password, 5);
     const activationLink = uuidv4();
-
     const user = await prisma.user.create({
       data: {
         fullName,
         email,
         password: hashPassword,
         activationLink,
-        cart: {
-          create: {
-            token: activationLink, // или другой уникальный токен
-            totalAmount: 0,
-          },
-        },
-      },
-      include: {
-        cart: true, // включаем корзину в ответ, если нужно
+        isActivated: false,
+        cart: { create: { token: activationLink, totalAmount: 0 } },
       },
     });
-
-    // письмо на email
     await mailService.sendActivationMail(
       email,
       `${process.env.API_URL}/api/activate/${activationLink}`,
     );
-
-    // генерирую токены
-    const userDTO = new UserDTO(user);
-    const tokens = tokenService.generateToken({ ...userDTO });
-    // сохраняю refreshToken в бд
-    await tokenService.saveToken(userDTO.id, tokens.refreshToken);
-    // возвращаю инфу о пользователи + токены
-    return { ...tokens, user: userDTO };
+    // ВАЖНО: токены не выдаём
+    return { message: "Письмо для активации отправлено", email: user.email };
   }
 
   // activationLink - ссылка на вход для пользователя, которая хранится в бд
   async activate(activationLink: string) {
-    const updatedUser = await prisma.user.update({
-      where: { activationLink },
-      data: { isActivated: true },
-    });
+    // const updatedUser = await prisma.user.update({
+    //   where: { activationLink },
+    //   data: { isActivated: true },
+    // });
 
-    if (!updatedUser) {
+    // if (!updatedUser) {
+    //   throw ErrorApi.BadRequestError("Некорректная ссылка активации");
+    // }
+
+    // return updatedUser; // опционально: вернуть обновлённого пользователя
+    const user = await prisma.user.findUnique({ where: { activationLink } });
+    if (!user) {
       throw ErrorApi.BadRequestError("Некорректная ссылка активации");
     }
-
-    return updatedUser; // опционально: вернуть обновлённого пользователя
+    if (user.isActivated) {
+      // можно разрешить и просто “логинить” по этой ссылке, но лучше не надо
+      // лучше сделать ссылку одноразовой — см. ниже
+    }
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isActivated: true,
+        activationLink: null, // сделай поле nullable в Prisma!
+      },
+    });
+    const userDTO = new UserDTO(updatedUser);
+    const tokens = tokenService.generateToken({ ...userDTO });
+    await tokenService.saveToken(userDTO.id, tokens.refreshToken);
+    return { ...tokens, user: userDTO };
   }
 
   async login(email: string, password: string) {
