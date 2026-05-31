@@ -89,6 +89,13 @@ router.post(
 
 router.get("/cart-show-order", authMiddleware, orderController.showOrder);
 
+// для увеличени/уменьшения товара +1/-1
+router.patch(
+  "/cart-change-quantity",
+  authMiddleware,
+  cartController.changeQuantity,
+);
+
 // + может быть логику сброса пароля?
 
 // + Оплата через Юкасса

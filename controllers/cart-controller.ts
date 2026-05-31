@@ -48,7 +48,8 @@ class Cart {
 
       const productId = parseInt(req.params.id as string);
 
-      const quantity = parseInt(req.body.quantity) || 1;
+      // const quantity = parseInt(req.body.quantity) || 1;
+      const quantity = 1;
 
       if (isNaN(productId)) {
         throw ErrorApi.BadRequestError("Некорректный ID товара");
@@ -100,6 +101,22 @@ class Cart {
       return res.json(selectProduct);
     } catch (error) {
       next(error);
+    }
+  }
+
+  async changeQuantity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getIdFromJWT(req, res, next);
+      const { id, delta } = req.body as { id: number; delta: number };
+
+      const updated = await cartService.changeQuantity(
+        userId,
+        Number(id),
+        Number(delta),
+      );
+      return res.json({ success: true, data: updated });
+    } catch (e) {
+      next(e);
     }
   }
 }

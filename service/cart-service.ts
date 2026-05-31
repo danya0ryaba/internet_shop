@@ -105,20 +105,18 @@ class CartService {
 
   // тут переписать тк в removeProductInCart тоже нужно использовать updateCartTotal
   private async updateCartTotal(cartId: number) {
-    // Получаем все товары в корзине
     const cartItems = await prisma.cartItem.findMany({
       where: { cartId },
       include: {
-        productItem: true,
+        productItem: { include: { product: true } },
       },
     });
 
-    // Вычисляем общую сумму
     const totalAmount = cartItems.reduce((sum, item) => {
-      return sum + item.productItem.price * item.quantity;
+      const price = item.productItem.product.price ?? 0;
+      return sum + price * item.quantity;
     }, 0);
 
-    // Обновляем корзину
     await prisma.cart.update({
       where: { id: cartId },
       data: { totalAmount },
@@ -185,6 +183,44 @@ class CartService {
       where: { id },
       data: { selected: !current.selected },
     });
+  }
+
+  async changeQuantity(userId: number, cartItemId: number, delta: number) {
+    if (!Number.isFinite(delta) || delta === 0) {
+      throw ErrorApi.BadRequestError("Некорректный delta");
+    }
+
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!cart) throw ErrorApi.BadRequestError("Корзина не найдена");
+
+    const item = await prisma.cartItem.findUnique({
+      where: { id: cartItemId },
+      select: { id: true, cartId: true, quantity: true },
+    });
+
+    if (!item || item.cartId !== cart.id) {
+      throw ErrorApi.BadRequestError("CartItem не найден или чужой");
+    }
+
+    const nextQty = item.quantity + Math.trunc(delta);
+
+    if (nextQty <= 0) {
+      await prisma.cartItem.delete({ where: { id: cartItemId } });
+      await this.updateCartTotal(cart.id);
+      return { id: cartItemId, deleted: true };
+    }
+
+    const updated = await prisma.cartItem.update({
+      where: { id: cartItemId },
+      data: { quantity: nextQty },
+      include: { productItem: { include: { product: true } } },
+    });
+
+    await this.updateCartTotal(cart.id);
+    return updated;
   }
 }
 
