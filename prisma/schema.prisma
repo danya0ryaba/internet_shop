@@ -57,6 +57,8 @@ model Product {
     price     Int
     size      Int?
 
+    quantityProduct Int @default(1)
+
     items       ProductItem[]
 
     category   Category @relation(fields: [categoryId], references: [id])
