@@ -23,6 +23,7 @@ export interface ProductCreateInput {
   price: number;
   size?: number;
   categoryName: string;
+  quantityProduct: number;
 }
 
 export type ProductWithId = ProductCreateInput & {

@@ -1,4 +1,5 @@
 import { ErrorApi } from "../exeptions/error-api";
+import { Prisma } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import { ProductCreateInput, ProductWithId } from "../types/types";
 
@@ -113,16 +114,24 @@ class ProductService {
     return newProduct;
   }
 
-  async updateProduct(body: ProductWithId) {
+  async updateProduct(body: Partial<ProductWithId>) {
+    if (!body.id) {
+      throw ErrorApi.BadRequestError("Отсутствует ID товара");
+    }
+
+    const updateData: Partial<Prisma.ProductUpdateInput> = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl;
+    if (body.description !== undefined)
+      updateData.description = body.description;
+    if (body.price !== undefined) updateData.price = body.price;
+    if (body.size !== undefined) updateData.size = body.size;
+    if (body.quantityProduct !== undefined)
+      updateData.quantityProduct = body.quantityProduct;
+
     const updateProduct = await prisma.product.update({
       where: { id: body.id },
-      data: {
-        name: body.name,
-        imageUrl: body.imageUrl,
-        description: body.description,
-        price: body.price,
-        size: body.size,
-      },
+      data: updateData,
     });
 
     if (!updateProduct) {

@@ -48,6 +48,7 @@ model Category {
     updatedAt DateTime @updatedAt
 }
 
+// дописать stock(есть ли в наличии)? 
 model Product {
     id Int @id @default(autoincrement())
 
