@@ -69,10 +69,17 @@ class ProductController {
   // только для ADMIN
   async createProduct(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, imageUrl, description, price, categoryName } =
+      const { name, imageUrl, description, price, categoryName, unit } =
         req.body as ProductCreateInput;
 
-      if (!name || !imageUrl || !description || !price || !categoryName) {
+      if (
+        !name ||
+        !imageUrl ||
+        !description ||
+        !price ||
+        !categoryName ||
+        !unit
+      ) {
         return res
           .status(400)
           .json({ message: "Все обязательные поля должны быть заполнены" });

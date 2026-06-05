@@ -24,6 +24,7 @@ export interface ProductCreateInput {
   size?: number;
   categoryName: string;
   quantityProduct: number;
+  unit: string;
 }
 
 export type ProductWithId = ProductCreateInput & {
