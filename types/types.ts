@@ -50,6 +50,7 @@ export interface IOrder {
 export interface IModelDTO {
   email: string;
   id: number;
+  fullName: string;
   isActivated: boolean;
   order?: unknown;
   role: UserRole;
@@ -61,6 +62,7 @@ export interface IUserDTO {
   user: {
     email: string;
     id: number;
+    fullName: string;
     isActivated: boolean;
     order?: unknown;
     role: UserRole;

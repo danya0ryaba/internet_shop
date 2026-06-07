@@ -43,8 +43,11 @@ class UserController {
       const { fullName, email, password } = req.body;
       const data = await userService.registration(fullName, email, password);
       return res.json(data);
-    } catch (e) {
-      next(e);
+    } catch (error) {
+      if (error instanceof ErrorApi) {
+        return next(error);
+      }
+      return next(ErrorApi.BadRequestError("Ошибка регистрации", [error]));
     }
   }
 

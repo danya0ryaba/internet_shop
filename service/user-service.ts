@@ -75,22 +75,12 @@ class UserService {
       email,
       `${process.env.API_URL}/api/activate/${activationLink}`,
     );
-    // ВАЖНО: токены не выдаём
+
     return { message: "Письмо для активации отправлено", email: user.email };
   }
 
   // activationLink - ссылка на вход для пользователя, которая хранится в бд
   async activate(activationLink: string) {
-    // const updatedUser = await prisma.user.update({
-    //   where: { activationLink },
-    //   data: { isActivated: true },
-    // });
-
-    // if (!updatedUser) {
-    //   throw ErrorApi.BadRequestError("Некорректная ссылка активации");
-    // }
-
-    // return updatedUser; // опционально: вернуть обновлённого пользователя
     const user = await prisma.user.findUnique({ where: { activationLink } });
     if (!user) {
       throw ErrorApi.BadRequestError("Некорректная ссылка активации");
@@ -103,7 +93,14 @@ class UserService {
       where: { id: user.id },
       data: {
         isActivated: true,
-        activationLink: null, // сделай поле nullable в Prisma!
+        activationLink: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        isActivated: true,
+        role: true,
       },
     });
     const userDTO = new UserDTO(updatedUser);
@@ -119,6 +116,7 @@ class UserService {
         // Может переписть userDTO, чтобы не брать лишнее?
         id: true,
         email: true,
+        fullName: true,
         isActivated: true,
         password: true,
         role: true,
@@ -187,14 +185,15 @@ class UserService {
         // Может переписть userDTO, чтобы не брать лишнее?
         id: true,
         email: true,
+        fullName: true,
         isActivated: true,
-        password: true, // явно запрашиваем все нужные поля
         role: true,
       },
     });
 
     const userDTO = new UserDTO({
       email: user!.email,
+      fullName: user!.fullName,
       id: user!.id,
       isActivated: user!.isActivated,
       role: user!.role,
