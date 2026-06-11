@@ -106,8 +106,21 @@ class ProductService {
         imageUrl: body.imageUrl,
         description: body.description,
         price: body.price,
-        size: body.size,
-        categoryId: category?.id,
+        size: body.size ?? null,
+        unit: body.unit ?? "шт",
+        categoryId: category.id,
+        items: {
+          create: [
+            {
+              price: body.price,
+              size: body.size ?? null,
+            },
+          ],
+        },
+      },
+      include: {
+        items: true,
+        category: true,
       },
     });
 

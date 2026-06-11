@@ -76,7 +76,7 @@ class ProductController {
         !name ||
         !imageUrl ||
         !description ||
-        !price ||
+        price === undefined ||
         !categoryName ||
         !unit
       ) {
