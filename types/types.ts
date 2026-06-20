@@ -69,13 +69,19 @@ export interface IUserDTO {
   };
 }
 
+export interface OrderItemPayload {
+  productId: number;
+  quantity: number;
+  price: number;
+}
+
 export interface OrderBody {
-  email: string;
-  phone: string;
   fullName: string;
-  address: string;
+  phone: string;
+  email: string;
+  delivery: "courier" | "pickup";
+  payment: "card" | "cash";
+  address?: string;
   comment?: string;
-  paymentId?: string;
-  token: string;
-  selectedCartItemIds?: number[];
+  items: OrderItemPayload[];
 }

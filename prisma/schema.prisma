@@ -120,7 +120,7 @@ model Order {
     user   User? @relation(fields: [userId], references: [id])
     userId Int?
 
-    token String
+    token String @default("")
 
     totalAmount Int
     status      OrderStatus
@@ -131,8 +131,11 @@ model Order {
     fullName String
     email    String
     phone    String
-    address  String
+    address  String?
     comment  String?
+
+    delivery  String @default("pickup")   // "courier" или "pickup"
+    payment   String @default("card")   // "card" или "cash"
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

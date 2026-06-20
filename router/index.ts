@@ -78,23 +78,18 @@ router.post(
   "/cart-make-on-order",
   authMiddleware,
   [
-    // body("fullName").notEmpty(),
-    // body("phone").isMobilePhone("ru-RU"),
-    // body("email").isEmail(),
-    // body("comment").optional(),
-    // body("delivery"),
-    // body("payment"),
-    // body("address").notEmpty(),
-    // body("token").notEmpty(),
-
-    body("fullName").notEmpty(),
-    body("phone").notEmpty(),
-    body("email").isEmail(),
+    body("fullName").notEmpty().withMessage("Укажите имя"),
+    body("phone").notEmpty().withMessage("Укажите телефон"),
+    body("email").isEmail().withMessage("Некорректный email"),
     body("delivery").isIn(["courier", "pickup"]),
-    body("paymentMethod").isIn(["card", "cash"]),
+    body("payment").isIn(["card", "cash"]), // Изменил с paymentMethod на payment
     body("address").optional().isString(),
     body("comment").optional().isString(),
-    body("selectedCartItemIds").optional().isArray(),
+    body("items").isArray({ min: 1 }).withMessage("Корзина пуста"),
+    body("items.*.productId").isInt().withMessage("Неверный формат товара"),
+    body("items.*.quantity")
+      .isInt({ min: 1 })
+      .withMessage("Неверное количество"),
   ],
   orderController.createOrder,
 );

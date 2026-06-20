@@ -8,19 +8,9 @@ class OrderController {
     try {
       const userId = getIdFromJWT(req, res, next);
       if (!userId) throw ErrorApi.UnauthorizenError();
+      const orderData = req.body;
 
-      const { email, phone, fullName, address, comment, paymentId, token } =
-        req.body;
-
-      const order = await orderService.createOrder(userId, {
-        email,
-        phone,
-        fullName,
-        address,
-        comment,
-        paymentId,
-        token,
-      });
+      const order = await orderService.createOrder(userId, orderData);
 
       res.status(201).json({
         success: true,
