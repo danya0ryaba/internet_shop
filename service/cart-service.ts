@@ -11,7 +11,7 @@ class CartService {
           include: {
             productItem: {
               include: {
-                product: true, // включая продукт
+                product: true,
               },
             },
           },
@@ -175,13 +175,19 @@ class CartService {
     return allCarts;
   }
 
-  async selectProduct(id: number) {
-    const current = await prisma.cartItem.findUnique({ where: { id } });
-    if (!current) throw ErrorApi.BadRequestError("CartItem не найден");
+  async selectProduct(userId: number, id: number) {
+    const item = await prisma.cartItem.findUnique({
+      where: { id },
+      include: { cart: { select: { userId: true } } },
+    });
+
+    if (!item || item.cart.userId !== userId) {
+      throw ErrorApi.BadRequestError("CartItem не найден или доступ запрещен");
+    }
 
     return prisma.cartItem.update({
       where: { id },
-      data: { selected: !current.selected },
+      data: { selected: !item.selected },
     });
   }
 

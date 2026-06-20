@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { orderService } from "../service/order-service";
 import { ErrorApi } from "../exeptions/error-api";
-import { IOrder } from "../types/types";
 import { getIdFromJWT } from "../lib/getIdFromJwt";
-import { prisma } from "../lib/prisma";
 
 class OrderController {
   async createOrder(req: Request, res: Response, next: NextFunction) {

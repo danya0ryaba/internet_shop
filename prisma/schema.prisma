@@ -181,3 +181,10 @@ enum UserRole {
     USER
     ADMIN
 }
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}

@@ -24,6 +24,7 @@ class Cart {
         items: cart.items.map((item) => ({
           id: item.id,
           quantity: item.quantity,
+          selected: item.selected ?? false,
           product: {
             id: item.productItem.product.id,
             name: item.productItem.product.name,
@@ -96,8 +97,9 @@ class Cart {
 
   async selectProduct(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = getIdFromJWT(req, res, next);
       const { id } = req.body;
-      const selectProduct = await cartService.selectProduct(id);
+      const selectProduct = await cartService.selectProduct(userId, id);
       return res.json(selectProduct);
     } catch (error) {
       next(error);
