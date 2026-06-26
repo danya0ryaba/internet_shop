@@ -7,6 +7,7 @@ import { authMiddleware } from "../middlewares/auth-middleware";
 import { adminMiddleware } from "../middlewares/admin-middleware";
 import { orderController } from "../controllers/order-controller";
 import { categoriesController } from "../controllers/categories-controller";
+import { upload } from "../utils/uploads";
 
 export const router = Router();
 
@@ -37,7 +38,9 @@ router.get("/product-search/", productController.searchProduct); // поиск �
 // только для админа
 router.post(
   "/product-create",
+  authMiddleware,
   adminMiddleware,
+  upload.array("images", 4),
   productController.createProduct,
 );
 router.patch(

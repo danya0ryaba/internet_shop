@@ -2,6 +2,7 @@ import { ErrorApi } from "../exeptions/error-api";
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import { ProductCreateInput, ProductWithId } from "../types/types";
+import { deleteFileFromDisk } from "../utils/uploads";
 
 class ProductService {
   async getAllProducts({ page, limit }: { page: number; limit: number }) {
@@ -9,7 +10,7 @@ class ProductService {
       prisma.product.findMany({
         skip: (page - 1) * limit,
         take: limit,
-        include: { category: true },
+        include: { category: true, images: true },
         orderBy: { id: "desc" },
       }),
       prisma.product.count(),
@@ -23,6 +24,7 @@ class ProductService {
       include: {
         category: true,
         items: true,
+        images: true,
       },
     });
     return product;
@@ -42,6 +44,7 @@ class ProductService {
         include: {
           items: true,
           category: true,
+          images: true,
         },
       });
 
@@ -86,41 +89,42 @@ class ProductService {
     }
   }
 
-  async createProduct(body: ProductCreateInput, categoryName: string) {
+  async createProduct(
+    body: ProductCreateInput,
+    categoryName: string,
+    imageUrls: string[],
+  ) {
     const category = await prisma.category.findUnique({
-      where: {
-        name: categoryName,
-      },
-      select: {
-        id: true,
-      },
+      where: { name: categoryName },
+      select: { id: true },
     });
 
     if (!category?.id) {
+      // Если категория не найдена, нужно удалить уже сохраненные на диск картинки!
+      for (const url of imageUrls) await deleteFileFromDisk(url);
       throw ErrorApi.BadRequestError("Такой категории не существует");
     }
 
     const newProduct = await prisma.product.create({
       data: {
         name: body.name,
-        imageUrl: body.imageUrl,
         description: body.description,
         price: body.price,
         size: body.size ?? null,
         unit: body.unit ?? "шт",
         categoryId: category.id,
         items: {
-          create: [
-            {
-              price: body.price,
-              size: body.size ?? null,
-            },
-          ],
+          create: [{ price: body.price, size: body.size ?? null }],
+        },
+        images: {
+          // Создаем записи о картинках в БД
+          create: imageUrls.map((url) => ({ url })),
         },
       },
       include: {
         items: true,
         category: true,
+        images: true, // Возвращаем картинки клиенту
       },
     });
 
@@ -134,7 +138,7 @@ class ProductService {
 
     const updateData: Partial<Prisma.ProductUpdateInput> = {};
     if (body.name !== undefined) updateData.name = body.name;
-    if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl;
+    // if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl;
     if (body.description !== undefined)
       updateData.description = body.description;
     if (body.price !== undefined) updateData.price = body.price;
@@ -155,6 +159,20 @@ class ProductService {
   }
 
   async deleteProduct(id: number) {
+    // 1. Находим товар и его картинки, чтобы удалить файлы с диска
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: { images: true },
+    });
+
+    if (!product) throw ErrorApi.BadRequestError("Товар не найден");
+
+    // 2. Удаляем файлы физически с сервера
+    for (const image of product.images) {
+      await deleteFileFromDisk(image.url);
+    }
+
+    // 3. Удаляем товар из БД (картинки удалятся каскадно благодаря схеме Prisma)
     const deletedProduct = await prisma.product.delete({
       where: { id },
     });

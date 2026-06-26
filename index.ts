@@ -4,11 +4,25 @@ import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import { router } from "./router";
 import { errorMiddleware } from "./middlewares/error-midleware";
+import path from "path";
 
 config();
 
 const PORT = process.env.PORT || 7000;
 const app = express();
+
+const uploadsPath = path.resolve(process.cwd(), "uploads");
+
+console.log("Ищу картинки по пути:", uploadsPath);
+
+// Кэшируем статику на 7 дней (в миллисекундах)
+app.use(
+  "/uploads",
+  express.static(uploadsPath, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    etag: true,
+  }),
+);
 
 app.use(express.json());
 app.use(cookieParser());

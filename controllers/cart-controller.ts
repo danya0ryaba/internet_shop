@@ -28,7 +28,7 @@ class Cart {
           product: {
             id: item.productItem.product.id,
             name: item.productItem.product.name,
-            imageUrl: item.productItem.product.imageUrl,
+            // imageUrl: item.productItem.product.imageUrl,
             description: item.productItem.product.description,
             price: item.productItem.product.price,
             size: item.productItem.size,
