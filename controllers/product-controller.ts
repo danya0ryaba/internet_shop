@@ -68,71 +68,6 @@ class ProductController {
 
   // только для ADMIN
   async createProduct(req: Request, res: Response, next: NextFunction) {
-    // try {
-    //   const { name, imageUrl, description, price, categoryName, unit } =
-    //     req.body as ProductCreateInput;
-    //   if (
-    //     !name ||
-    //     !imageUrl ||
-    //     !description ||
-    //     price === undefined ||
-    //     !categoryName ||
-    //     !unit
-    //   ) {
-    //     return res
-    //       .status(400)
-    //       .json({ message: "Все обязательные поля должны быть заполнены" });
-    //   }
-    //   const newProduct = await productService.createProduct(
-    //     req.body,
-    //     categoryName,
-    //   );
-    //   return res.json(newProduct);
-    // } catch (error) {
-    //   console.error(error);
-    //   next(error);
-    // }
-    // try {
-    //   const { name, description, price, categoryName, unit } = req.body;
-    //   const files = req.files as Express.Multer.File[] | undefined;
-    //   if (
-    //     !name ||
-    //     !description ||
-    //     price === undefined ||
-    //     !categoryName ||
-    //     !unit
-    //   ) {
-    //     return res
-    //       .status(400)
-    //       .json({ message: "Все обязательные поля должны быть заполнены" });
-    //   }
-    //   if (!files || files.length === 0) {
-    //     return res
-    //       .status(400)
-    //       .json({ message: "Необходимо загрузить хотя бы одно изображение" });
-    //   }
-    //   // Обрабатываем все картинки через sharp и получаем массив URL
-    //   const imageUrls: string[] = [];
-    //   for (const file of files) {
-    //     const url = await processImage(file);
-    //     imageUrls.push(url);
-    //   }
-    //   const newProduct = await productService.createProduct(
-    //     {
-    //       name,
-    //       description,
-    //       price: Number(price),
-    //       unit,
-    //       size: req.body.size ? Number(req.body.size) : undefined,
-    //     },
-    //     categoryName,
-    //     imageUrls,
-    //   );
-    //   return res.status(201).json(newProduct);
-    // } catch (error) {
-    //   next(error);
-    // }
-
     try {
       // ДОБАВИЛ quantityProduct сюда
       const { name, description, price, categoryName, unit, quantityProduct } =
@@ -196,19 +131,6 @@ class ProductController {
   }
 
   async deleteProduct(req: Request, res: Response, next: NextFunction) {
-    // try {
-    //   const { id } = req.body;
-    //   const idNumber = parseInt(id);
-    //   if (idNumber || idNumber === 0) {
-    //     const deleteProduct = await productService.deleteProduct(idNumber);
-    //     return res.json(deleteProduct);
-    //   } else {
-    //     return res.json({ message: "Нет такого id для удаления" });
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   next(error);
-    // }
     try {
       const { id } = req.body;
       const idNumber = parseInt(id);

@@ -117,14 +117,13 @@ class ProductService {
           create: [{ price: body.price, size: body.size ?? null }],
         },
         images: {
-          // Создаем записи о картинках в БД
           create: imageUrls.map((url) => ({ url })),
         },
       },
       include: {
         items: true,
         category: true,
-        images: true, // Возвращаем картинки клиенту
+        images: true,
       },
     });
 

@@ -11,7 +11,11 @@ class CartService {
           include: {
             productItem: {
               include: {
-                product: true,
+                product: {
+                  include: {
+                    images: true,
+                  },
+                },
               },
             },
           },

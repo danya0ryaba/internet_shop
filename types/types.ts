@@ -18,7 +18,6 @@ export interface IUser {
 
 export interface ProductCreateInput {
   name: string;
-  // imageUrl: string;
   description: string;
   price: number;
   size?: number;

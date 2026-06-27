@@ -32,6 +32,11 @@ class Cart {
             description: item.productItem.product.description,
             price: item.productItem.product.price,
             size: item.productItem.size,
+
+            images: item.productItem.product.images.map((img) => ({
+              id: img.id,
+              url: img.url, // "/uploads/images/123.webp"
+            })),
           },
         })),
       };
