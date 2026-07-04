@@ -20,11 +20,8 @@ const fileFilter = (
 
 export const upload = multer({ storage, fileFilter });
 
-// Функция для обработки одного файла
 export async function processImage(file: Express.Multer.File): Promise<string> {
   const filename = `${uuidv4()}.webp`;
-
-  // Добавили filename в конец пути!
   const outputPath = path.resolve(process.cwd(), "uploads/images", filename);
 
   await sharp(file.buffer)
@@ -35,11 +32,10 @@ export async function processImage(file: Express.Multer.File): Promise<string> {
   return `/uploads/images/${filename}`;
 }
 
-// Функция для удаления файла с диска
 export async function deleteFileFromDisk(fileUrl: string) {
   try {
-    // fileUrl выглядит как "/uploads/images/123.webp"
-    const filePath = path.resolve(process.cwd(), fileUrl);
+    const normalizedUrl = fileUrl.startsWith("/") ? fileUrl.slice(1) : fileUrl;
+    const filePath = path.resolve(process.cwd(), normalizedUrl);
     await fs.unlink(filePath);
   } catch (error) {
     console.error(`Ошибка удаления файла ${fileUrl}:`, error);

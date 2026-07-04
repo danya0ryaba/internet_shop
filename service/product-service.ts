@@ -100,7 +100,6 @@ class ProductService {
     });
 
     if (!category?.id) {
-      // Если категория не найдена, нужно удалить уже сохраненные на диск картинки!
       for (const url of imageUrls) await deleteFileFromDisk(url);
       throw ErrorApi.BadRequestError("Такой категории не существует");
     }
@@ -137,13 +136,13 @@ class ProductService {
 
     const updateData: Partial<Prisma.ProductUpdateInput> = {};
     if (body.name !== undefined) updateData.name = body.name;
-    // if (body.imageUrl !== undefined) updateData.imageUrl = body.imageUrl;
     if (body.description !== undefined)
       updateData.description = body.description;
     if (body.price !== undefined) updateData.price = body.price;
     if (body.size !== undefined) updateData.size = body.size;
-    if (body.quantityProduct !== undefined)
+    if (body.quantityProduct !== undefined) {
       updateData.quantityProduct = body.quantityProduct;
+    }
 
     const updateProduct = await prisma.product.update({
       where: { id: body.id },
@@ -158,22 +157,48 @@ class ProductService {
   }
 
   async deleteProduct(id: number) {
-    // 1. Находим товар и его картинки, чтобы удалить файлы с диска
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { images: true },
+      include: {
+        images: true,
+        items: true,
+      },
     });
 
     if (!product) throw ErrorApi.BadRequestError("Товар не найден");
 
-    // 2. Удаляем файлы физически с сервера
     for (const image of product.images) {
       await deleteFileFromDisk(image.url);
     }
 
-    // 3. Удаляем товар из БД (картинки удалятся каскадно благодаря схеме Prisma)
-    const deletedProduct = await prisma.product.delete({
-      where: { id },
+    const deletedProduct = await prisma.$transaction(async (tx) => {
+      await tx.cartItem.deleteMany({
+        where: {
+          productItem: {
+            productId: id,
+          },
+        },
+      });
+
+      await tx.orderItem.deleteMany({
+        where: {
+          productItem: {
+            productId: id,
+          },
+        },
+      });
+
+      await tx.productItem.deleteMany({
+        where: { productId: id },
+      });
+
+      await tx.productImage.deleteMany({
+        where: { productId: id },
+      });
+
+      return tx.product.delete({
+        where: { id },
+      });
     });
 
     return deletedProduct;

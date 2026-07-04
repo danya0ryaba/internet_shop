@@ -48,11 +48,14 @@ router.patch(
   adminMiddleware,
   productController.updateProduct,
 );
+
 router.delete(
-  "/product-delete",
+  "/product-delete/:id",
+  authMiddleware,
   adminMiddleware,
   productController.deleteProduct,
 );
+
 router.get("/show-all-orders", adminMiddleware, orderController.allOrders); // админ должен иметь возможность смотреть заказы
 
 // cart

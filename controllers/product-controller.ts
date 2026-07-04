@@ -66,10 +66,8 @@ class ProductController {
     }
   }
 
-  // только для ADMIN
   async createProduct(req: Request, res: Response, next: NextFunction) {
     try {
-      // ДОБАВИЛ quantityProduct сюда
       const { name, description, price, categoryName, unit, quantityProduct } =
         req.body;
       const files = req.files as Express.Multer.File[] | undefined;
@@ -105,12 +103,11 @@ class ProductController {
           price: Number(price),
           unit,
           size: req.body.size ? Number(req.body.size) : undefined,
-          // ДОБАВИЛ quantityProduct сюда (если пустое, уйдет undefined, и Prisma поставит 1 по умолчанию)
           quantityProduct: quantityProduct
             ? Number(quantityProduct)
             : undefined,
         },
-        categoryName, // Передаем отдельно
+        categoryName,
         imageUrls,
       );
 
@@ -132,13 +129,15 @@ class ProductController {
 
   async deleteProduct(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.body;
-      const idNumber = parseInt(id);
-      if (!idNumber && idNumber !== 0) {
+      const id = Number(req.params.id);
+      console.log("deleteProduct");
+      console.log("id = " + id);
+
+      if (isNaN(id)) {
         return res.status(400).json({ message: "Нет такого id для удаления" });
       }
 
-      const deleteProduct = await productService.deleteProduct(idNumber);
+      const deleteProduct = await productService.deleteProduct(id);
       return res.json(deleteProduct);
     } catch (error) {
       next(error);
