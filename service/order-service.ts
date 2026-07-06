@@ -179,7 +179,7 @@ class OrderService {
         items: {
           include: {
             productItem: {
-              include: { product: true }, // чтобы вернуть имя, изображение и т.д.
+              include: { product: true },
             },
           },
         },
@@ -203,11 +203,10 @@ class OrderService {
             productItem: {
               include: {
                 product: {
-                  // что именно заказали
                   select: {
                     id: true,
                     name: true,
-                    imageUrl: true,
+                    images: true,
                     description: true,
                   },
                 },

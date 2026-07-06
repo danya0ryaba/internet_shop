@@ -24,6 +24,7 @@ export interface ProductCreateInput {
   // categoryName: string;
   quantityProduct?: number;
   unit: string;
+  deliveryToCities: boolean;
 }
 
 export type ProductWithId = ProductCreateInput & {

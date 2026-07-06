@@ -68,8 +68,16 @@ class ProductController {
 
   async createProduct(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, description, price, categoryName, unit, quantityProduct } =
-        req.body;
+      const {
+        name,
+        description,
+        price,
+        categoryName,
+        unit,
+        quantityProduct,
+        deliveryToCities,
+      } = req.body;
+
       const files = req.files as Express.Multer.File[] | undefined;
 
       if (
@@ -90,10 +98,10 @@ class ProductController {
           .json({ message: "Необходимо загрузить хотя бы одно изображение" });
       }
 
-      const imageUrls: string[] = [];
+      const images: string[] = [];
       for (const file of files) {
         const url = await processImage(file);
-        imageUrls.push(url);
+        images.push(url);
       }
 
       const newProduct = await productService.createProduct(
@@ -106,9 +114,10 @@ class ProductController {
           quantityProduct: quantityProduct
             ? Number(quantityProduct)
             : undefined,
+          deliveryToCities: deliveryToCities === "true",
         },
         categoryName,
-        imageUrls,
+        images,
       );
 
       return res.status(201).json(newProduct);
@@ -130,8 +139,6 @@ class ProductController {
   async deleteProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const id = Number(req.params.id);
-      console.log("deleteProduct");
-      console.log("id = " + id);
 
       if (isNaN(id)) {
         return res.status(400).json({ message: "Нет такого id для удаления" });

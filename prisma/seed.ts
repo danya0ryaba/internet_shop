@@ -2,7 +2,6 @@ import * as bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma";
 
 async function main() {
-  // Очистка базы данных (Удаляем картинки в первую очередь из-за каскада)
   await prisma.productImage.deleteMany(); // <--- ДОБАВЛЕНО
   await prisma.token.deleteMany();
   await prisma.orderItem.deleteMany();
@@ -19,7 +18,7 @@ async function main() {
   const categoriesData = [
     { name: "Овощи" },
     { name: "Цветы" },
-    { name: "Зелень_и_травы" }, // Лучше без пробелов для URL
+    { name: "Зелень и травы" },
     { name: "Грибы" },
     { name: "Ягоды" },
     { name: "Другое" },
@@ -94,7 +93,7 @@ async function main() {
       description: "Ароматная свежая мята для чая или десертов.",
       price: 20,
       size: null,
-      categoryId: categoryMap["Зелень_и_травы"],
+      categoryId: categoryMap["Зелень и травы"],
       items: [
         { price: 20, size: null },
         { price: 25, size: null },
@@ -131,8 +130,10 @@ async function main() {
         description: productData.description,
         price: productData.price,
         size: productData.size,
-        categoryId: productData.categoryId,
-        // Создаем товарные позиции (items)
+        deliveryToCities: true,
+        category: {
+          connect: { id: productData.categoryId },
+        },
         items: {
           create: productData.items,
         },
